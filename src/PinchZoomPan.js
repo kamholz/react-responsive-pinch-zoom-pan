@@ -556,12 +556,12 @@ export default class PinchZoomPan extends React.Component {
     componentDidMount() {
         window.addEventListener("resize", this.handleWindowResize);
         this.maybeHandleDimensionsChanged();
-        if (this.props.onchange) this.props.onchange(this.state);
+        if (this.props.onChange) this.props.onChange(this.state);
     }
 
     componentDidUpdate(prevProps, prevState) {
         this.maybeHandleDimensionsChanged();
-        if (this.props.onchange) this.props.onchange(this.state);
+        if (this.props.onChange) this.props.onChange(this.state);
     }
 
     componentWillUnmount() {
