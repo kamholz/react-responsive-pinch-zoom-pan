@@ -11,7 +11,9 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 
 var _reactFontawesome = require("@fortawesome/react-fontawesome");
 
-var _freeSolidSvgIcons = require("@fortawesome/free-solid-svg-icons");
+var _faPlus = require("@fortawesome/free-solid-svg-icons/faPlus");
+
+var _faMinus = require("@fortawesome/free-solid-svg-icons/faMinus");
 
 require("./styles.css");
 
@@ -33,7 +35,7 @@ var ZoomOutButton = function ZoomOutButton(_ref) {
     onClick: onClick,
     disabled: disabled
   }, _react.default.createElement(_reactFontawesome.FontAwesomeIcon, {
-    icon: _freeSolidSvgIcons.faMinus
+    icon: _faMinus.faMinus
   }));
 };
 
@@ -49,7 +51,7 @@ var ZoomInButton = function ZoomInButton(_ref2) {
     onClick: onClick,
     disabled: disabled
   }, _react.default.createElement(_reactFontawesome.FontAwesomeIcon, {
-    icon: _freeSolidSvgIcons.faPlus
+    icon: _faPlus.faPlus
   }));
 };
 
