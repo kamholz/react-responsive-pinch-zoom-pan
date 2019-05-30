@@ -4,7 +4,7 @@ import pkg from './package.json';
 export default {
   input: 'src/PinchZoomPan.js',
   output: [
-    { file: 'dist/PinchZoomPan.esm.js', format: 'esm' },
+    { file: 'dist/PinchZoomPan.mjs', format: 'esm' },
     { file: 'dist/PinchZoomPan.js', format: 'cjs' },
   ],
   external: [
