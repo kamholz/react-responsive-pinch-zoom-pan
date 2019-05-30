@@ -1,14 +1,10 @@
-'use strict';
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var React = _interopDefault(require('react'));
-var PropTypes = _interopDefault(require('prop-types'));
-var reselect = require('reselect');
-var warning = _interopDefault(require('warning'));
-var reactFontawesome = require('@fortawesome/react-fontawesome');
-var freeSolidSvgIcons = require('@fortawesome/free-solid-svg-icons');
-require('./styles.css');
+import React from 'react';
+import PropTypes from 'prop-types';
+import { createSelector } from 'reselect';
+import warning from 'warning';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
+import './styles.css';
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -184,8 +180,8 @@ var ZoomOutButton = function ZoomOutButton(_ref) {
     },
     onClick: onClick,
     disabled: disabled
-  }, React.createElement(reactFontawesome.FontAwesomeIcon, {
-    icon: freeSolidSvgIcons.faMinus
+  }, React.createElement(FontAwesomeIcon, {
+    icon: faMinus
   }));
 };
 
@@ -200,8 +196,8 @@ var ZoomInButton = function ZoomInButton(_ref2) {
     },
     onClick: onClick,
     disabled: disabled
-  }, React.createElement(reactFontawesome.FontAwesomeIcon, {
-    icon: freeSolidSvgIcons.faPlus
+  }, React.createElement(FontAwesomeIcon, {
+    icon: faPlus
   }));
 };
 
@@ -343,7 +339,7 @@ var getAutofitScale = function getAutofitScale(containerDimensions, imageDimensi
 
   return Math.min(containerDimensions.width / imageWidth, containerDimensions.height / imageHeight, 1);
 };
-var getMinScale = reselect.createSelector(function (state) {
+var getMinScale = createSelector(function (state) {
   return state.containerDimensions;
 }, function (state) {
   return state.imageDimensions;
@@ -411,7 +407,7 @@ var isInitialized = function isInitialized(top, left, scale) {
   return scale !== undefined && left !== undefined && top !== undefined;
 };
 
-var imageStyle = reselect.createSelector(function (state) {
+var imageStyle = createSelector(function (state) {
   return state.top;
 }, function (state) {
   return state.left;
@@ -426,7 +422,7 @@ var imageStyle = reselect.createSelector(function (state) {
     transformOrigin: '0 0'
   }) : style;
 });
-var imageOverflow = reselect.createSelector(function (state) {
+var imageOverflow = createSelector(function (state) {
   return state.top;
 }, function (state) {
   return state.left;
@@ -443,7 +439,7 @@ var imageOverflow = reselect.createSelector(function (state) {
 
   return getImageOverflow(top, left, scale, imageDimensions, containerDimensions);
 });
-var browserPanActions = reselect.createSelector(imageOverflow, function (imageOverflow) {
+var browserPanActions = createSelector(imageOverflow, function (imageOverflow) {
   //Determine the panning directions where there is no image overflow and let
   //the browser handle those directions (e.g., scroll viewport if possible).
   //Need to replace 'pan-left pan-right' with 'pan-x', etc. otherwise
@@ -1088,4 +1084,4 @@ PinchZoomPan.propTypes = {
   initialLeft: PropTypes.number
 };
 
-module.exports = PinchZoomPan;
+export default PinchZoomPan;

@@ -3,10 +3,11 @@
   "version": "0.2.2",
   "description": "Enables zooming and panning an image, both mobile and desktop.",
   "main": "dist/PinchZoomPan.js",
+  "module": "dist/PinchZoomPan.esm.js",
   "scripts": {
     "start": "webpack-dev-server --mode development --host 0.0.0.0",
     "test": "jest",
-    "transpile": "babel src -d dist --copy-files",
+    "transpile": "rollup -c && cp -f src/styles.css dist",
     "prepublishOnly": "npm run transpile",
     "build": "webpack --mode production",
     "deploy": "gh-pages -d examples/dist",
@@ -42,6 +43,8 @@
     "jest": "23.6.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
+    "rollup": "^1.12.4",
+    "rollup-plugin-babel": "^4.3.2",
     "style-loader": "0.23.0",
     "url-loader": "1.1.1",
     "webpack": "4.19.1",
@@ -58,6 +61,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.13",
     "@fortawesome/free-solid-svg-icons": "^5.7.0",
     "@fortawesome/react-fontawesome": "^0.1.4",
+    "prop-types": "^15.7.2",
     "reselect": "^4.0.0",
     "warning": "^4.0.2"
   },
@@ -79,8 +83,8 @@
   },
   "babel": {
     "presets": [
-      "@babel/env",
-      "@babel/react"
+      "@babel/preset-env",
+      "@babel/preset-react"
     ],
     "plugins": [
       "@babel/plugin-proposal-class-properties"
