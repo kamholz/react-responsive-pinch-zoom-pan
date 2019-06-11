@@ -164,6 +164,12 @@ export default class PinchZoomPan extends React.Component {
     }
 
     handleMouseDoubleClick = event => {
+        /*if (this.state.enhance) {
+            this.setState({ enhance: false });
+        } else if (this.props.iiifUrl) {
+            this.setState({ enhance: true, enhanceUrl: this.getImageRegionUrl() });
+        }*/
+
         this.cancelAnimation();
         var pointerPosition = getRelativePosition(event, this.imageRef.parentNode);
         this.doubleClick(pointerPosition);
@@ -493,6 +499,16 @@ export default class PinchZoomPan extends React.Component {
         this.constrainAndApplyTransform(initialPosition.top, initialPosition.left, scale, 0, speed);
     }
 
+    getImageRegionUrl() {
+        let { left, top, scale, containerDimensions, imageDimensions } = this.state;
+        let xPct = (-100 * left / (imageDimensions.width * scale)).toFixed(2);
+        let yPct = (-100 * top / (imageDimensions.height * scale)).toFixed(2);
+        let widthPct = (100 * containerDimensions.width / (imageDimensions.width * scale)).toFixed(2);
+        let heightPct = (100 * containerDimensions.height / (imageDimensions.height * scale)).toFixed(2);
+
+        return `${this.props.iiifUrl}/pct:${xPct},${yPct},${widthPct},${heightPct}/full/0/default.jpg`;
+    }
+
     //lifecycle methods
     render() {
         const childElement = React.Children.only(this.props.children);
@@ -533,6 +549,13 @@ export default class PinchZoomPan extends React.Component {
                     ref: this.handleRefImage,
                     style: imageStyle(this.state)
                 })}
+                {this.state.enhance &&
+                    <img
+                        className={this.props.enhanceClassName}
+                        src={this.state.enhanceUrl}
+                        onDoubleClick={this.handleMouseDoubleClick}
+                    />
+                }
             </div>
         );
     }
@@ -556,12 +579,10 @@ export default class PinchZoomPan extends React.Component {
     componentDidMount() {
         window.addEventListener("resize", this.handleWindowResize);
         this.maybeHandleDimensionsChanged();
-        if (this.props.onChange) this.props.onChange(this.state);
     }
 
     componentDidUpdate(prevProps, prevState) {
         this.maybeHandleDimensionsChanged();
-        if (this.props.onChange) this.props.onChange(this.state);
     }
 
     componentWillUnmount() {
