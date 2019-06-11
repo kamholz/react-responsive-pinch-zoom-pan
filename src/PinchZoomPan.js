@@ -76,6 +76,7 @@ export default class PinchZoomPan extends React.Component {
     lastPinchLength; //helps determine if we are pinching in or out
     animation; //current animation handle
     imageRef; //image element
+    canvasRef = React.createRef();
     isImageLoaded; //permits initial transform
     originalOverscrollBehaviorY; //saves the original overscroll-behavior-y value while temporarily preventing pull down refresh
 
@@ -164,11 +165,7 @@ export default class PinchZoomPan extends React.Component {
     }
 
     handleMouseDoubleClick = event => {
-        /*if (this.state.enhance) {
-            this.setState({ enhance: false });
-        } else if (this.props.iiifUrl) {
-            this.setState({ enhance: true, enhanceUrl: this.getImageRegionUrl() });
-        }*/
+        //this.zoomInEnhance();
 
         this.cancelAnimation();
         var pointerPosition = getRelativePosition(event, this.imageRef.parentNode);
@@ -194,12 +191,9 @@ export default class PinchZoomPan extends React.Component {
     handleImageLoad = event => {
         this.debug('handleImageLoad');
         this.isImageLoaded = true;
+        //this.canvasRef.current.style.height = `${event.target.height}px`;
+        //this.canvasRef.current.style.width = `${event.target.width}px`;
         this.maybeHandleDimensionsChanged();
-
-        const { onLoad } = React.Children.only(this.props.children);
-        if (typeof onLoad === 'function') {
-            onLoad(event);
-        }
     }
 
     handleZoomInClick = () => {
@@ -224,9 +218,6 @@ export default class PinchZoomPan extends React.Component {
         if (ref) {
             this.imageRef.addEventListener('touchmove', this.handleTouchMove, { passive: false });
         }
-
-        const { ref: imageRefProp } = React.Children.only(this.props.children);
-        setRef(imageRefProp, ref);
     };
 
     //actions
@@ -499,19 +490,35 @@ export default class PinchZoomPan extends React.Component {
         this.constrainAndApplyTransform(initialPosition.top, initialPosition.left, scale, 0, speed);
     }
 
-    getImageRegionUrl() {
+    zoomInEnhance() {
+        let imageRegion = this.getImageRegion();
+        let canvas = this.canvasRef.current;
+        let ctx = canvas.getContext("2d");
+
+        let img = new Image();
+        img.addEventListener("load", () => {
+            console.log(`drawing at ${imageRegion.xPct * canvas.width}, ${imageRegion.yPct * canvas.height}`);
+            ctx.drawImage(img, imageRegion.xPct * canvas.width, imageRegion.yPct * canvas.height);
+        });
+        img.src = imageRegion.url;
+    }
+
+    getImageRegion() {
         let { left, top, scale, containerDimensions, imageDimensions } = this.state;
         let xPct = (-100 * left / (imageDimensions.width * scale)).toFixed(2);
         let yPct = (-100 * top / (imageDimensions.height * scale)).toFixed(2);
         let widthPct = (100 * containerDimensions.width / (imageDimensions.width * scale)).toFixed(2);
         let heightPct = (100 * containerDimensions.height / (imageDimensions.height * scale)).toFixed(2);
 
-        return `${this.props.iiifUrl}/pct:${xPct},${yPct},${widthPct},${heightPct}/full/0/default.jpg`;
+        return {
+            xPct: xPct / 100.0,
+            yPct: yPct / 100.0,
+            url: `${this.props.iiifUrl}/pct:${xPct},${yPct},${widthPct},${heightPct}/full/0/default.jpg`,
+        };
     }
 
     //lifecycle methods
     render() {
-        const childElement = React.Children.only(this.props.children);
         const { zoomButtons, maxScale, debug } = this.props;
         const { scale } = this.state;
 
@@ -536,26 +543,29 @@ export default class PinchZoomPan extends React.Component {
                     onZoomInClick={this.handleZoomInClick}
                 />}
                 {debug && <DebugView {...this.state} overflow={imageOverflow(this.state)} />}
-                {React.cloneElement(childElement, {
-                    onTouchStart: this.handleTouchStart,
-                    onTouchEnd: this.handleTouchEnd,
-                    onMouseDown: this.handleMouseDown,
-                    onMouseMove: this.handleMouseMove,
-                    onDoubleClick: this.handleMouseDoubleClick,
-                    onWheel: this.handleMouseWheel,
-                    onDragStart: tryCancelEvent,
-                    onLoad: this.handleImageLoad,
-                    onContextMenu: tryCancelEvent,
-                    ref: this.handleRefImage,
-                    style: imageStyle(this.state)
-                })}
-                {this.state.enhance &&
+                <div
+                    ref={this.handleRefImage}
+                    onTouchStart={this.handleTouchStart}
+                    onTouchEnd={this.handleTouchEnd}
+                    onMouseDown={this.handleMouseDown}
+                    onMouseMove={this.handleMouseMove}
+                    onDoubleClick={this.handleMouseDoubleClick}
+                    onWheel={this.handleMouseWheel}
+                    onDragStart={tryCancelEvent}
+                    onContextMenu={tryCancelEvent}
+                    style={imageStyle(this.state)}
+                >
                     <img
-                        className={this.props.enhanceClassName}
-                        src={this.state.enhanceUrl}
-                        onDoubleClick={this.handleMouseDoubleClick}
+                        src={this.props.imageUrl}
+                        onLoad={this.handleImageLoad}
                     />
-                }
+                    <canvas
+                        className={this.props.enhanceClassName}
+                        ref={this.canvasRef}
+                        height="3744"
+                        width="5616"
+                    />
+                </div>
             </div>
         );
     }
@@ -592,7 +602,7 @@ export default class PinchZoomPan extends React.Component {
     }
 
     get isImageReady() {
-        return this.isImageLoaded || (this.imageRef && this.imageRef.tagName !== 'IMG');
+        return this.isImageLoaded;
     }
 
     get isTransformInitialized() {
@@ -637,7 +647,6 @@ PinchZoomPan.defaultProps = {
 };
 
 PinchZoomPan.propTypes = {
-    children: PropTypes.element.isRequired,
     initialScale: PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.string

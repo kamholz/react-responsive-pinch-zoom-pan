@@ -283,13 +283,6 @@ var getPinchLength = function getPinchLength(_ref4) {
 
   return Math.sqrt(Math.pow(touch1.clientY - touch2.clientY, 2) + Math.pow(touch1.clientX - touch2.clientX, 2));
 };
-function setRef(ref, value) {
-  if (typeof ref === 'function') {
-    ref(value);
-  } else if (ref) {
-    ref.current = value;
-  }
-}
 var isEqualDimensions = function isEqualDimensions(dimensions1, dimensions2) {
   if (dimensions1 === dimensions2 === undefined) {
     return true;
@@ -481,6 +474,8 @@ function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_this), "imageRef", void 0);
 
+    _defineProperty(_assertThisInitialized(_this), "canvasRef", React.createRef());
+
     _defineProperty(_assertThisInitialized(_this), "isImageLoaded", void 0);
 
     _defineProperty(_assertThisInitialized(_this), "originalOverscrollBehaviorY", void 0);
@@ -578,11 +573,7 @@ function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "handleMouseDoubleClick", function (event) {
-      /*if (this.state.enhance) {
-          this.setState({ enhance: false });
-      } else if (this.props.iiifUrl) {
-          this.setState({ enhance: true, enhanceUrl: this.getImageRegionUrl() });
-      }*/
+      //this.zoomInEnhance();
       _this.cancelAnimation();
 
       var pointerPosition = getRelativePosition(event, _this.imageRef.parentNode);
@@ -613,16 +604,10 @@ function (_React$Component) {
     _defineProperty(_assertThisInitialized(_this), "handleImageLoad", function (event) {
       _this.debug('handleImageLoad');
 
-      _this.isImageLoaded = true;
+      _this.isImageLoaded = true; //this.canvasRef.current.style.height = `${event.target.height}px`;
+      //this.canvasRef.current.style.width = `${event.target.width}px`;
 
       _this.maybeHandleDimensionsChanged();
-
-      var _React$Children$only = React.Children.only(_this.props.children),
-          onLoad = _React$Children$only.onLoad;
-
-      if (typeof onLoad === 'function') {
-        onLoad(event);
-      }
     });
 
     _defineProperty(_assertThisInitialized(_this), "handleZoomInClick", function () {
@@ -655,11 +640,6 @@ function (_React$Component) {
           passive: false
         });
       }
-
-      var _React$Children$only2 = React.Children.only(_this.props.children),
-          imageRefProp = _React$Children$only2.ref;
-
-      setRef(imageRefProp, ref);
     });
 
     return _this;
@@ -948,8 +928,21 @@ function (_React$Component) {
       this.constrainAndApplyTransform(initialPosition.top, initialPosition.left, scale, 0, speed);
     }
   }, {
-    key: "getImageRegionUrl",
-    value: function getImageRegionUrl() {
+    key: "zoomInEnhance",
+    value: function zoomInEnhance() {
+      var imageRegion = this.getImageRegion();
+      var canvas = this.canvasRef.current;
+      var ctx = canvas.getContext("2d");
+      var img = new Image();
+      img.addEventListener("load", function () {
+        console.log("drawing at ".concat(imageRegion.xPct * canvas.width, ", ").concat(imageRegion.yPct * canvas.height));
+        ctx.drawImage(img, imageRegion.xPct * canvas.width, imageRegion.yPct * canvas.height);
+      });
+      img.src = imageRegion.url;
+    }
+  }, {
+    key: "getImageRegion",
+    value: function getImageRegion() {
       var _this$state4 = this.state,
           left = _this$state4.left,
           top = _this$state4.top,
@@ -960,13 +953,16 @@ function (_React$Component) {
       var yPct = (-100 * top / (imageDimensions.height * scale)).toFixed(2);
       var widthPct = (100 * containerDimensions.width / (imageDimensions.width * scale)).toFixed(2);
       var heightPct = (100 * containerDimensions.height / (imageDimensions.height * scale)).toFixed(2);
-      return "".concat(this.props.iiifUrl, "/pct:").concat(xPct, ",").concat(yPct, ",").concat(widthPct, ",").concat(heightPct, "/full/0/default.jpg");
+      return {
+        xPct: xPct / 100.0,
+        yPct: yPct / 100.0,
+        url: "".concat(this.props.iiifUrl, "/pct:").concat(xPct, ",").concat(yPct, ",").concat(widthPct, ",").concat(heightPct, "/full/0/default.jpg")
+      };
     } //lifecycle methods
 
   }, {
     key: "render",
     value: function render() {
-      var childElement = React.Children.only(this.props.children);
       var _this$props3 = this.props,
           zoomButtons = _this$props3.zoomButtons,
           maxScale = _this$props3.maxScale,
@@ -989,7 +985,8 @@ function (_React$Component) {
         onZoomInClick: this.handleZoomInClick
       }), debug && React.createElement(DebugView, _extends({}, this.state, {
         overflow: imageOverflow(this.state)
-      })), React.cloneElement(childElement, {
+      })), React.createElement("div", {
+        ref: this.handleRefImage,
         onTouchStart: this.handleTouchStart,
         onTouchEnd: this.handleTouchEnd,
         onMouseDown: this.handleMouseDown,
@@ -997,15 +994,17 @@ function (_React$Component) {
         onDoubleClick: this.handleMouseDoubleClick,
         onWheel: this.handleMouseWheel,
         onDragStart: tryCancelEvent,
-        onLoad: this.handleImageLoad,
         onContextMenu: tryCancelEvent,
-        ref: this.handleRefImage,
         style: imageStyle(this.state)
-      }), this.state.enhance && React.createElement("img", {
+      }, React.createElement("img", {
+        src: this.props.imageUrl,
+        onLoad: this.handleImageLoad
+      }), React.createElement("canvas", {
         className: this.props.enhanceClassName,
-        src: this.state.enhanceUrl,
-        onDoubleClick: this.handleMouseDoubleClick
-      }));
+        ref: this.canvasRef,
+        height: "3744",
+        width: "5616"
+      })));
     }
   }, {
     key: "componentDidMount",
@@ -1056,7 +1055,7 @@ function (_React$Component) {
   }, {
     key: "isImageReady",
     get: function get() {
-      return this.isImageLoaded || this.imageRef && this.imageRef.tagName !== 'IMG';
+      return this.isImageLoaded;
     }
   }, {
     key: "isTransformInitialized",
@@ -1095,7 +1094,6 @@ PinchZoomPan.defaultProps = {
   doubleTapBehavior: 'reset'
 };
 PinchZoomPan.propTypes = {
-  children: PropTypes.element.isRequired,
   initialScale: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   minScale: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   maxScale: PropTypes.number,
