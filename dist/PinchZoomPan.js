@@ -582,6 +582,11 @@ function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "handleMouseDoubleClick", function (event) {
+      /*if (this.state.enhance) {
+          this.setState({ enhance: false });
+      } else if (this.props.iiifUrl) {
+          this.setState({ enhance: true, enhanceUrl: this.getImageRegionUrl() });
+      }*/
       _this.cancelAnimation();
 
       var pointerPosition = getRelativePosition(event, _this.imageRef.parentNode);
@@ -945,6 +950,21 @@ function (_React$Component) {
       }
 
       this.constrainAndApplyTransform(initialPosition.top, initialPosition.left, scale, 0, speed);
+    }
+  }, {
+    key: "getImageRegionUrl",
+    value: function getImageRegionUrl() {
+      var _this$state4 = this.state,
+          left = _this$state4.left,
+          top = _this$state4.top,
+          scale = _this$state4.scale,
+          containerDimensions = _this$state4.containerDimensions,
+          imageDimensions = _this$state4.imageDimensions;
+      var xPct = (-100 * left / (imageDimensions.width * scale)).toFixed(2);
+      var yPct = (-100 * top / (imageDimensions.height * scale)).toFixed(2);
+      var widthPct = (100 * containerDimensions.width / (imageDimensions.width * scale)).toFixed(2);
+      var heightPct = (100 * containerDimensions.height / (imageDimensions.height * scale)).toFixed(2);
+      return "".concat(this.props.iiifUrl, "/pct:").concat(xPct, ",").concat(yPct, ",").concat(widthPct, ",").concat(heightPct, "/full/0/default.jpg");
     } //lifecycle methods
 
   }, {
@@ -985,6 +1005,10 @@ function (_React$Component) {
         onContextMenu: tryCancelEvent,
         ref: this.handleRefImage,
         style: imageStyle(this.state)
+      }), this.state.enhance && React.createElement("img", {
+        className: this.props.enhanceClassName,
+        src: this.state.enhanceUrl,
+        onDoubleClick: this.handleMouseDoubleClick
       }));
     }
   }, {
@@ -992,13 +1016,11 @@ function (_React$Component) {
     value: function componentDidMount() {
       window.addEventListener("resize", this.handleWindowResize);
       this.maybeHandleDimensionsChanged();
-      if (this.props.onChange) this.props.onChange(this.state);
     }
   }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate(prevProps, prevState) {
       this.maybeHandleDimensionsChanged();
-      if (this.props.onChange) this.props.onChange(this.state);
     }
   }, {
     key: "componentWillUnmount",
@@ -1011,9 +1033,9 @@ function (_React$Component) {
     key: "calculateNegativeSpace",
     value: function calculateNegativeSpace(scale) {
       //get difference in dimension between container and scaled image
-      var _this$state4 = this.state,
-          containerDimensions = _this$state4.containerDimensions,
-          imageDimensions = _this$state4.imageDimensions;
+      var _this$state5 = this.state,
+          containerDimensions = _this$state5.containerDimensions,
+          imageDimensions = _this$state5.imageDimensions;
       var width = containerDimensions.width - scale * imageDimensions.width;
       var height = containerDimensions.height - scale * imageDimensions.height;
       return {
