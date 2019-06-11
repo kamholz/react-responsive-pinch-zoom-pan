@@ -493,35 +493,34 @@ export default class PinchZoomPan extends React.Component {
     }
 
     zoomInEnhance() {
-        let imageRegion = this.getImageRegion();
-        let canvas = this.canvasRef.current;
-        let ctx = canvas.getContext("2d");
+        let imageRegion = this.getCanvasRegion();
+        let ctx = this.canvasRef.current.getContext("2d");
 
         let img = new Image();
         img.addEventListener("load", () => {
-            //console.log(`drawing at ${imageRegion.xPct * canvas.width}, ${imageRegion.yPct * canvas.height}`);
-            ctx.drawImage(img, imageRegion.xPct * canvas.width, imageRegion.yPct * canvas.height);
+            ctx.drawImage(img, imageRegion.x, imageRegion.y);
         });
         img.src = imageRegion.url;
     }
 
-    getImageRegion() {
+    getCanvasRegion() {
         let { left, top, scale, containerDimensions, imageDimensions } = this.state;
-        let xPct = (-100 * left / (imageDimensions.width * scale)).toFixed(2);
-        let yPct = (-100 * top / (imageDimensions.height * scale)).toFixed(2);
-        let widthPct = (100 * containerDimensions.width / (imageDimensions.width * scale)).toFixed(2);
-        let heightPct = (100 * containerDimensions.height / (imageDimensions.height * scale)).toFixed(2);
+        let { iiifDimensions: { width: canvasWidth, height: canvasHeight } } = this.props;
+        let x = Math.round(canvasWidth * -1 * left / (imageDimensions.width * scale));
+        let y = Math.round(canvasHeight * -1 * top / (imageDimensions.height * scale));
+        let width = Math.round(canvasWidth * containerDimensions.width / (imageDimensions.width * scale));
+        let height = Math.round(canvasHeight * containerDimensions.height / (imageDimensions.height * scale));
 
         return {
-            xPct: xPct / 100.0,
-            yPct: yPct / 100.0,
-            url: `${this.props.iiifUrl}/pct:${xPct},${yPct},${widthPct},${heightPct}/full/0/default.jpg`,
+            x,
+            y,
+            url: `${this.props.iiifUrl}/${x},${y},${width},${height}/full/0/default.jpg`,
         };
     }
 
     //lifecycle methods
     render() {
-        const { zoomButtons, maxScale, debug } = this.props;
+        const { zoomButtons, maxScale, debug, iiifUrl, iiifDimensions } = this.props;
         const { scale } = this.state;
 
         const touchAction = this.controlOverscrollViaCss
@@ -561,12 +560,14 @@ export default class PinchZoomPan extends React.Component {
                         src={this.props.imageUrl}
                         onLoad={this.handleImageLoad}
                     />
-                    <canvas
-                        className="canvasOverlay"
-                        ref={this.canvasRef}
-                        height="3744"
-                        width="5616"
-                    />
+                    {iiifUrl && iiifDimensions &&
+                        <canvas
+                            className="canvasOverlay"
+                            ref={this.canvasRef}
+                            height={iiifDimensions.height}
+                            width={iiifDimensions.width}
+                        />
+                    }
                 </div>
             </div>
         );

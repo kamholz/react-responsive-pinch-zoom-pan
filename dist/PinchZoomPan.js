@@ -936,33 +936,35 @@ function (_React$Component) {
   }, {
     key: "zoomInEnhance",
     value: function zoomInEnhance() {
-      var imageRegion = this.getImageRegion();
-      var canvas = this.canvasRef.current;
-      var ctx = canvas.getContext("2d");
+      var imageRegion = this.getCanvasRegion();
+      var ctx = this.canvasRef.current.getContext("2d");
       var img = new Image();
       img.addEventListener("load", function () {
         //console.log(`drawing at ${imageRegion.xPct * canvas.width}, ${imageRegion.yPct * canvas.height}`);
-        ctx.drawImage(img, imageRegion.xPct * canvas.width, imageRegion.yPct * canvas.height);
+        ctx.drawImage(img, imageRegion.x, imageRegion.y);
       });
       img.src = imageRegion.url;
     }
   }, {
-    key: "getImageRegion",
-    value: function getImageRegion() {
+    key: "getCanvasRegion",
+    value: function getCanvasRegion() {
       var _this$state4 = this.state,
           left = _this$state4.left,
           top = _this$state4.top,
           scale = _this$state4.scale,
           containerDimensions = _this$state4.containerDimensions,
           imageDimensions = _this$state4.imageDimensions;
-      var xPct = (-100 * left / (imageDimensions.width * scale)).toFixed(2);
-      var yPct = (-100 * top / (imageDimensions.height * scale)).toFixed(2);
-      var widthPct = (100 * containerDimensions.width / (imageDimensions.width * scale)).toFixed(2);
-      var heightPct = (100 * containerDimensions.height / (imageDimensions.height * scale)).toFixed(2);
+      var _this$props$iiifDimen = this.props.iiifDimensions,
+          canvasWidth = _this$props$iiifDimen.width,
+          canvasHeight = _this$props$iiifDimen.height;
+      var x = Math.round(canvasWidth * -1 * left / (imageDimensions.width * scale));
+      var y = Math.round(canvasHeight * -1 * top / (imageDimensions.height * scale));
+      var width = Math.round(canvasWidth * containerDimensions.width / (imageDimensions.width * scale));
+      var height = Math.round(canvasHeight * containerDimensions.height / (imageDimensions.height * scale));
       return {
-        xPct: xPct / 100.0,
-        yPct: yPct / 100.0,
-        url: "".concat(this.props.iiifUrl, "/pct:").concat(xPct, ",").concat(yPct, ",").concat(widthPct, ",").concat(heightPct, "/full/0/default.jpg")
+        x: x,
+        y: y,
+        url: "".concat(this.props.iiifUrl, "/").concat(x, ",").concat(y, ",").concat(width, ",").concat(height, "/full/0/default.jpg")
       };
     } //lifecycle methods
 
@@ -972,7 +974,9 @@ function (_React$Component) {
       var _this$props3 = this.props,
           zoomButtons = _this$props3.zoomButtons,
           maxScale = _this$props3.maxScale,
-          debug = _this$props3.debug;
+          debug = _this$props3.debug,
+          iiifUrl = _this$props3.iiifUrl,
+          iiifDimensions = _this$props3.iiifDimensions;
       var scale = this.state.scale;
       var touchAction = this.controlOverscrollViaCss ? browserPanActions(this.state) || 'none' : undefined;
       var containerStyle = {
@@ -1005,11 +1009,11 @@ function (_React$Component) {
       }, React.createElement("img", {
         src: this.props.imageUrl,
         onLoad: this.handleImageLoad
-      }), React.createElement("canvas", {
+      }), iiifUrl && iiifDimensions && React.createElement("canvas", {
         className: "canvasOverlay",
         ref: this.canvasRef,
-        height: "3744",
-        width: "5616"
+        height: iiifDimensions.height,
+        width: iiifDimensions.width
       })));
     }
   }, {
