@@ -412,7 +412,9 @@ var imageStyle = reselect.createSelector(function (state) {
   return state.scale;
 }, function (top, left, scale) {
   var style = {
-    cursor: 'pointer'
+    cursor: 'pointer',
+    display: 'inline-block',
+    userSelect: 'none'
   };
   return isInitialized(top, left, scale) ? _objectSpread({}, style, {
     transform: "translate3d(".concat(left, "px, ").concat(top, "px, 0) scale(").concat(scale, ")"),
@@ -476,7 +478,7 @@ function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_this), "animation", void 0);
 
-    _defineProperty(_assertThisInitialized(_this), "imageRef", void 0);
+    _defineProperty(_assertThisInitialized(_this), "divRef", void 0);
 
     _defineProperty(_assertThisInitialized(_this), "canvasRef", React.createRef());
 
@@ -548,7 +550,7 @@ function (_React$Component) {
 
       if (event.touches.length === 0 && event.changedTouches.length === 1) {
         if (_this.lastPointerUpTimeStamp && _this.lastPointerUpTimeStamp + DOUBLE_TAP_THRESHOLD > event.timeStamp) {
-          var pointerPosition = getRelativePosition(event.changedTouches[0], _this.imageRef.parentNode);
+          var pointerPosition = getRelativePosition(event.changedTouches[0], _this.divRef.parentNode);
 
           _this.doubleClick(pointerPosition);
         }
@@ -577,10 +579,10 @@ function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "handleMouseDoubleClick", function (event) {
-      //this.zoomInEnhance();
+      // this.zoomInEnhance();
       _this.cancelAnimation();
 
-      var pointerPosition = getRelativePosition(event, _this.imageRef.parentNode);
+      var pointerPosition = getRelativePosition(event, _this.divRef.parentNode);
 
       _this.doubleClick(pointerPosition);
     });
@@ -588,7 +590,7 @@ function (_React$Component) {
     _defineProperty(_assertThisInitialized(_this), "handleMouseWheel", function (event) {
       _this.cancelAnimation();
 
-      var point = getRelativePosition(event, _this.imageRef.parentNode);
+      var point = getRelativePosition(event, _this.divRef.parentNode);
 
       if (event.deltaY > 0) {
         if (_this.state.scale > getMinScale(_this.state, _this.props)) {
@@ -630,17 +632,17 @@ function (_React$Component) {
       return _this.maybeHandleDimensionsChanged();
     });
 
-    _defineProperty(_assertThisInitialized(_this), "handleRefImage", function (ref) {
-      if (_this.imageRef) {
+    _defineProperty(_assertThisInitialized(_this), "handleRefDiv", function (ref) {
+      if (_this.divRef) {
         _this.cancelAnimation();
 
-        _this.imageRef.removeEventListener('touchmove', _this.handleTouchMove);
+        _this.divRef.removeEventListener('touchmove', _this.handleTouchMove);
       }
 
-      _this.imageRef = ref;
+      _this.divRef = ref;
 
       if (ref) {
-        _this.imageRef.addEventListener('touchmove', _this.handleTouchMove, {
+        _this.divRef.addEventListener('touchmove', _this.handleTouchMove, {
           passive: false
         });
       }
@@ -653,7 +655,7 @@ function (_React$Component) {
     key: "pointerDown",
     //actions
     value: function pointerDown(clientPosition) {
-      this.lastPanPointerPosition = getRelativePosition(clientPosition, this.imageRef.parentNode);
+      this.lastPanPointerPosition = getRelativePosition(clientPosition, this.divRef.parentNode);
     }
   }, {
     key: "pan",
@@ -668,7 +670,7 @@ function (_React$Component) {
         return 0;
       }
 
-      var pointerPosition = getRelativePosition(pointerClientPosition, this.imageRef.parentNode);
+      var pointerPosition = getRelativePosition(pointerClientPosition, this.divRef.parentNode);
       var translateX = pointerPosition.x - this.lastPanPointerPosition.x;
       var translateY = pointerPosition.y - this.lastPanPointerPosition.y;
       this.lastPanPointerPosition = pointerPosition;
@@ -754,8 +756,8 @@ function (_React$Component) {
       var _this2 = this;
 
       if (this.isImageReady) {
-        var containerDimensions = getContainerDimensions(this.imageRef);
-        var imageDimensions = getDimensions(this.imageRef);
+        var containerDimensions = getContainerDimensions(this.divRef);
+        var imageDimensions = getDimensions(this.divRef);
 
         if (!isEqualDimensions(containerDimensions, getDimensions(this.state.containerDimensions)) || !isEqualDimensions(imageDimensions, getDimensions(this.state.imageDimensions))) {
           this.cancelAnimation(); //capture new dimensions
@@ -939,7 +941,7 @@ function (_React$Component) {
       var ctx = canvas.getContext("2d");
       var img = new Image();
       img.addEventListener("load", function () {
-        console.log("drawing at ".concat(imageRegion.xPct * canvas.width, ", ").concat(imageRegion.yPct * canvas.height));
+        //console.log(`drawing at ${imageRegion.xPct * canvas.width}, ${imageRegion.yPct * canvas.height}`);
         ctx.drawImage(img, imageRegion.xPct * canvas.width, imageRegion.yPct * canvas.height);
       });
       img.src = imageRegion.url;
@@ -990,7 +992,7 @@ function (_React$Component) {
       }), debug && React.createElement(DebugView, _extends({}, this.state, {
         overflow: imageOverflow(this.state)
       })), React.createElement("div", {
-        ref: this.handleRefImage,
+        ref: this.handleRefDiv,
         onTouchStart: this.handleTouchStart,
         onTouchEnd: this.handleTouchEnd,
         onMouseDown: this.handleMouseDown,
@@ -1004,7 +1006,7 @@ function (_React$Component) {
         src: this.props.imageUrl,
         onLoad: this.handleImageLoad
       }), React.createElement("canvas", {
-        className: this.props.enhanceClassName,
+        className: "canvasOverlay",
         ref: this.canvasRef,
         height: "3744",
         width: "5616"
@@ -1025,7 +1027,7 @@ function (_React$Component) {
     key: "componentWillUnmount",
     value: function componentWillUnmount() {
       this.cancelAnimation();
-      this.imageRef.removeEventListener('touchmove', this.handleTouchMove);
+      this.divRef.removeEventListener('touchmove', this.handleTouchMove);
       window.removeEventListener('resize', this.handleWindowResize);
     }
   }, {
