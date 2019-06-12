@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { createSelector } from 'reselect';
 import warning from 'warning';
+import RBush from 'rbush';
 
 import ZoomButtons from './ZoomButtons'
 import DebugView from './StateDebugView';
@@ -79,6 +80,7 @@ export default class PinchZoomPan extends React.Component {
     animation; //current animation handle
     divRef; //div element
     canvasRef = React.createRef();
+    canvasIndex = new RBush();
     isImageLoaded; //permits initial transform
     originalOverscrollBehaviorY; //saves the original overscroll-behavior-y value while temporarily preventing pull down refresh
 
@@ -494,13 +496,34 @@ export default class PinchZoomPan extends React.Component {
 
     zoomInEnhance() {
         let imageRegion = this.getCanvasRegion();
-        let ctx = this.canvasRef.current.getContext("2d");
+        let rect = {
+            minX: imageRegion.x,
+            minY: imageRegion.y,
+            maxX: imageRegion.x + imageRegion.width,
+            maxY: imageRegion.y + imageRegion.height,
+        };
 
-        let img = new Image();
-        img.addEventListener("load", () => {
-            ctx.drawImage(img, imageRegion.x, imageRegion.y);
+        if (!this.alreadyEnhanced(rect)) {
+            let ctx = this.canvasRef.current.getContext("2d");
+
+            const img = new Image();
+
+            const onLoad = () => {
+                ctx.drawImage(img, imageRegion.x, imageRegion.y);
+                this.canvasIndex.insert(rect);
+                img.removeEventListener("load", onLoad);
+            };
+            img.addEventListener("load", onLoad, { once: true });
+
+            img.src = imageRegion.url;
+        }
+    }
+
+    alreadyEnhanced(rect) {
+        const result = this.canvasIndex.search(rect);
+        return result.length && result.some(el => {
+            return rect.minX >= el.minX && rect.maxX <= el.maxX && rect.minY >= el.minY && rect.maxY <= el.maxY;
         });
-        img.src = imageRegion.url;
     }
 
     getCanvasRegion() {
@@ -514,6 +537,8 @@ export default class PinchZoomPan extends React.Component {
         return {
             x,
             y,
+            width,
+            height,
             url: `${this.props.iiifUrl}/${x},${y},${width},${height}/full/0/default.jpg`,
         };
     }

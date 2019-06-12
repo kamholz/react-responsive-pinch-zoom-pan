@@ -6,6 +6,7 @@ var React = _interopDefault(require('react'));
 var PropTypes = _interopDefault(require('prop-types'));
 var reselect = require('reselect');
 var warning = _interopDefault(require('warning'));
+var RBush = _interopDefault(require('rbush'));
 var reactFontawesome = require('@fortawesome/react-fontawesome');
 var freeSolidSvgIcons = require('@fortawesome/free-solid-svg-icons');
 require('./styles.css');
@@ -482,6 +483,8 @@ function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_this), "canvasRef", React.createRef());
 
+    _defineProperty(_assertThisInitialized(_this), "canvasIndex", new RBush());
+
     _defineProperty(_assertThisInitialized(_this), "isImageLoaded", void 0);
 
     _defineProperty(_assertThisInitialized(_this), "originalOverscrollBehaviorY", void 0);
@@ -936,14 +939,41 @@ function (_React$Component) {
   }, {
     key: "zoomInEnhance",
     value: function zoomInEnhance() {
+      var _this4 = this;
+
       var imageRegion = this.getCanvasRegion();
-      var ctx = this.canvasRef.current.getContext("2d");
-      var img = new Image();
-      img.addEventListener("load", function () {
-        //console.log(`drawing at ${imageRegion.xPct * canvas.width}, ${imageRegion.yPct * canvas.height}`);
-        ctx.drawImage(img, imageRegion.x, imageRegion.y);
+      var rect = {
+        minX: imageRegion.x,
+        minY: imageRegion.y,
+        maxX: imageRegion.x + imageRegion.width,
+        maxY: imageRegion.y + imageRegion.height
+      };
+
+      if (!this.alreadyEnhanced(rect)) {
+        var ctx = this.canvasRef.current.getContext("2d");
+        var img = new Image();
+
+        var onLoad = function onLoad() {
+          ctx.drawImage(img, imageRegion.x, imageRegion.y);
+
+          _this4.canvasIndex.insert(rect);
+
+          img.removeEventListener("load", onLoad);
+        };
+
+        img.addEventListener("load", onLoad, {
+          once: true
+        });
+        img.src = imageRegion.url;
+      }
+    }
+  }, {
+    key: "alreadyEnhanced",
+    value: function alreadyEnhanced(rect) {
+      var result = this.canvasIndex.search(rect);
+      return result.length && result.some(function (el) {
+        return rect.minX >= el.minX && rect.maxX <= el.maxX && rect.minY >= el.minY && rect.maxY <= el.maxY;
       });
-      img.src = imageRegion.url;
     }
   }, {
     key: "getCanvasRegion",
@@ -964,6 +994,8 @@ function (_React$Component) {
       return {
         x: x,
         y: y,
+        width: width,
+        height: height,
         url: "".concat(this.props.iiifUrl, "/").concat(x, ",").concat(y, ",").concat(width, ",").concat(height, "/full/0/default.jpg")
       };
     } //lifecycle methods
