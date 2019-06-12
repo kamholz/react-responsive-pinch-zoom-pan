@@ -448,8 +448,23 @@ var browserPanActions = reselect.createSelector(imageOverflow, function (imageOv
   : !imageOverflow.left ? 'pan-left' : !imageOverflow.right ? 'pan-right' : '';
   var browserPanY = !imageOverflow.top && !imageOverflow.bottom ? 'pan-y' : !imageOverflow.top ? 'pan-up' : !imageOverflow.bottom ? 'pan-down' : '';
   return [browserPanX, browserPanY].join(' ').trim();
-}); //Ensure the image is not over-panned, and not over- or under-scaled.
+});
+
+var debounce = function debounce(func, delay) {
+  var callTime, callTimer;
+  return function (args) {
+    var previousTime = callTime;
+    callTime = Date.now();
+
+    if (previousTime && callTime - previousTime <= delay) {
+      clearTimeout(callTimer);
+    }
+
+    callTimer = setTimeout(func, delay, args);
+  };
+}; //Ensure the image is not over-panned, and not over- or under-scaled.
 //These constraints must be checked when image changes, and when container is resized.
+
 
 var PinchZoomPan =
 /*#__PURE__*/
@@ -582,7 +597,6 @@ function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "handleMouseDoubleClick", function (event) {
-      // this.zoomInEnhance();
       _this.cancelAnimation();
 
       var pointerPosition = getRelativePosition(event, _this.divRef.parentNode);
@@ -648,6 +662,36 @@ function (_React$Component) {
         _this.divRef.addEventListener('touchmove', _this.handleTouchMove, {
           passive: false
         });
+      }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "enhance", function () {
+      var imageRegion = _this.getCanvasRegion();
+
+      var rect = {
+        minX: imageRegion.x,
+        minY: imageRegion.y,
+        maxX: imageRegion.x + imageRegion.width,
+        maxY: imageRegion.y + imageRegion.height
+      };
+
+      if (!_this.alreadyEnhanced(rect)) {
+        var ctx = _this.canvasRef.current.getContext("2d");
+
+        var img = new Image();
+
+        var onLoad = function onLoad() {
+          ctx.drawImage(img, imageRegion.x, imageRegion.y);
+
+          _this.canvasIndex.insert(rect);
+
+          img.removeEventListener("load", onLoad);
+        };
+
+        img.addEventListener("load", onLoad, {
+          once: true
+        });
+        img.src = imageRegion.url;
       }
     });
 
@@ -816,6 +860,10 @@ function (_React$Component) {
           left = _ref.left,
           scale = _ref.scale;
 
+      if (scale >= this.props.enhanceScale) {
+        debounce(this.enhance, this.props.enhanceDelay)();
+      }
+
       if (speed > 0) {
         var frame = function frame() {
           var translateY = top - _this3.state.top;
@@ -935,37 +983,6 @@ function (_React$Component) {
       }
 
       this.constrainAndApplyTransform(initialPosition.top, initialPosition.left, scale, 0, speed);
-    }
-  }, {
-    key: "zoomInEnhance",
-    value: function zoomInEnhance() {
-      var _this4 = this;
-
-      var imageRegion = this.getCanvasRegion();
-      var rect = {
-        minX: imageRegion.x,
-        minY: imageRegion.y,
-        maxX: imageRegion.x + imageRegion.width,
-        maxY: imageRegion.y + imageRegion.height
-      };
-
-      if (!this.alreadyEnhanced(rect)) {
-        var ctx = this.canvasRef.current.getContext("2d");
-        var img = new Image();
-
-        var onLoad = function onLoad() {
-          ctx.drawImage(img, imageRegion.x, imageRegion.y);
-
-          _this4.canvasIndex.insert(rect);
-
-          img.removeEventListener("load", onLoad);
-        };
-
-        img.addEventListener("load", onLoad, {
-          once: true
-        });
-        img.src = imageRegion.url;
-      }
     }
   }, {
     key: "alreadyEnhanced",
@@ -1131,6 +1148,8 @@ PinchZoomPan.defaultProps = {
   initialScale: 'auto',
   minScale: 'auto',
   maxScale: 1,
+  enhanceScale: 1.5,
+  enhanceDelay: 500,
   position: 'topLeft',
   zoomButtons: true,
   doubleTapBehavior: 'reset'

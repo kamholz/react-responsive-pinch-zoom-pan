@@ -69,6 +69,19 @@ const browserPanActions = createSelector(
     }
 );
 
+const debounce = (func, delay) => {
+    let callTime, callTimer;
+
+    return (args) => {
+        let previousTime = callTime;
+        callTime = Date.now();
+        if (previousTime && (callTime - previousTime) <= delay) {
+            clearTimeout(callTimer);
+        }
+        callTimer = setTimeout(func, delay, args);
+    }
+}
+
 //Ensure the image is not over-panned, and not over- or under-scaled.
 //These constraints must be checked when image changes, and when container is resized.
 export default class PinchZoomPan extends React.Component {
@@ -169,8 +182,6 @@ export default class PinchZoomPan extends React.Component {
     }
 
     handleMouseDoubleClick = event => {
-        // this.zoomInEnhance();
-
         this.cancelAnimation();
         var pointerPosition = getRelativePosition(event, this.divRef.parentNode);
         this.doubleClick(pointerPosition);
@@ -374,6 +385,10 @@ export default class PinchZoomPan extends React.Component {
     }
 
     applyTransform({ top, left, scale }, speed) {
+        if (scale >= this.props.enhanceScale) {
+            debounce(this.enhance, this.props.enhanceDelay)();
+        }
+
         if (speed > 0) {
             const frame = () => {
                 const translateY = top - this.state.top;
@@ -494,7 +509,7 @@ export default class PinchZoomPan extends React.Component {
         this.constrainAndApplyTransform(initialPosition.top, initialPosition.left, scale, 0, speed);
     }
 
-    zoomInEnhance() {
+    enhance = () => {
         let imageRegion = this.getCanvasRegion();
         let rect = {
             minX: imageRegion.x,
@@ -669,6 +684,8 @@ PinchZoomPan.defaultProps = {
     initialScale: 'auto',
     minScale: 'auto',
     maxScale: 1,
+    enhanceScale: 1.5,
+    enhanceDelay: 500,
     position: 'topLeft',
     zoomButtons: true,
     doubleTapBehavior: 'reset'
