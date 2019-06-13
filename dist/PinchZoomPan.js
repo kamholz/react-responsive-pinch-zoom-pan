@@ -665,7 +665,7 @@ function (_React$Component) {
       }
     });
 
-    _defineProperty(_assertThisInitialized(_this), "enhance", function () {
+    _defineProperty(_assertThisInitialized(_this), "enhance", debounce(function () {
       var imageRegion = _this.getCanvasRegion();
 
       var rect = {
@@ -676,11 +676,11 @@ function (_React$Component) {
       };
 
       if (!_this.alreadyEnhanced(rect)) {
-        var ctx = _this.canvasRef.current.getContext("2d");
-
         var img = new Image();
 
         var onLoad = function onLoad() {
+          var ctx = _this.canvasRef.current.getContext("2d");
+
           ctx.drawImage(img, imageRegion.x, imageRegion.y);
 
           _this.canvasIndex.insert(rect);
@@ -693,7 +693,7 @@ function (_React$Component) {
         });
         img.src = imageRegion.url;
       }
-    });
+    }, _this.props.enhanceDelay));
 
     return _this;
   }
@@ -860,8 +860,8 @@ function (_React$Component) {
           left = _ref.left,
           scale = _ref.scale;
 
-      if (scale >= this.props.enhanceScale) {
-        debounce(this.enhance, this.props.enhanceDelay)();
+      if (this.canvasRef.current && scale >= this.props.enhanceScale) {
+        this.enhance();
       }
 
       if (speed > 0) {

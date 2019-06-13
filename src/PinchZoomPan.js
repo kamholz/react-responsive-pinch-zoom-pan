@@ -386,7 +386,7 @@ export default class PinchZoomPan extends React.Component {
 
     applyTransform({ top, left, scale }, speed) {
         if (this.canvasRef.current && scale >= this.props.enhanceScale) {
-            debounce(this.enhance, this.props.enhanceDelay)();
+            this.enhance();
         }
 
         if (speed > 0) {
@@ -509,7 +509,7 @@ export default class PinchZoomPan extends React.Component {
         this.constrainAndApplyTransform(initialPosition.top, initialPosition.left, scale, 0, speed);
     }
 
-    enhance = () => {
+    enhance = debounce(() => {
         let imageRegion = this.getCanvasRegion();
         let rect = {
             minX: imageRegion.x,
@@ -531,7 +531,7 @@ export default class PinchZoomPan extends React.Component {
 
             img.src = imageRegion.url;
         }
-    }
+    }, this.props.enhanceDelay)
 
     alreadyEnhanced(rect) {
         let result = this.canvasIndex.search(rect);
