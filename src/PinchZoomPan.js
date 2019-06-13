@@ -534,7 +534,7 @@ export default class PinchZoomPan extends React.Component {
     }
 
     alreadyEnhanced(rect) {
-        const result = this.canvasIndex.search(rect);
+        let result = this.canvasIndex.search(rect);
         return result.length && result.some(el => {
             return rect.minX >= el.minX && rect.maxX <= el.maxX && rect.minY >= el.minY && rect.maxY <= el.maxY;
         });
