@@ -519,11 +519,10 @@ export default class PinchZoomPan extends React.Component {
         };
 
         if (!this.alreadyEnhanced(rect)) {
-            let ctx = this.canvasRef.current.getContext("2d");
-
-            const img = new Image();
+            let img = new Image();
 
             const onLoad = () => {
+                let ctx = this.canvasRef.current.getContext("2d");
                 ctx.drawImage(img, imageRegion.x, imageRegion.y);
                 this.canvasIndex.insert(rect);
                 img.removeEventListener("load", onLoad);
