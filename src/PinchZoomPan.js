@@ -510,12 +510,12 @@ export default class PinchZoomPan extends React.Component {
     }
 
     enhance = debounce(() => {
-        let imageRegion = this.getCanvasRegion();
+        let canvasRegion = this.getCanvasRegion();
         let rect = {
-            minX: imageRegion.x,
-            minY: imageRegion.y,
-            maxX: imageRegion.x + imageRegion.width,
-            maxY: imageRegion.y + imageRegion.height,
+            minX: canvasRegion.x,
+            minY: canvasRegion.y,
+            maxX: canvasRegion.x + canvasRegion.width,
+            maxY: canvasRegion.y + canvasRegion.height,
         };
 
         if (!this.alreadyEnhanced(rect)) {
@@ -523,13 +523,13 @@ export default class PinchZoomPan extends React.Component {
 
             const onLoad = () => {
                 let ctx = this.canvasRef.current.getContext("2d");
-                ctx.drawImage(img, imageRegion.x, imageRegion.y);
+                ctx.drawImage(img, canvasRegion.x, canvasRegion.y);
                 this.canvasIndex.insert(rect);
                 img.removeEventListener("load", onLoad);
             };
             img.addEventListener("load", onLoad, { once: true });
 
-            img.src = imageRegion.url;
+            img.src = canvasRegion.url;
         }
     }, this.props.enhanceDelay)
 
