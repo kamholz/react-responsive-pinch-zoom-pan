@@ -385,7 +385,7 @@ export default class PinchZoomPan extends React.Component {
     }
 
     applyTransform({ top, left, scale }, speed) {
-        if (this.canvasRef.current && scale >= this.props.enhanceScale) {
+        if (this.state.containerDimensions.width this.canvasRef.current && scale >= this.props.enhanceScale) {
             this.enhance();
         }
 
