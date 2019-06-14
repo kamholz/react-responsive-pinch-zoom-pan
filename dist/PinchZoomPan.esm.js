@@ -662,13 +662,13 @@ function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "enhance", debounce(function () {
-      var imageRegion = _this.getCanvasRegion();
+      var canvasRegion = _this.getCanvasRegion();
 
       var rect = {
-        minX: imageRegion.x,
-        minY: imageRegion.y,
-        maxX: imageRegion.x + imageRegion.width,
-        maxY: imageRegion.y + imageRegion.height
+        minX: canvasRegion.x,
+        minY: canvasRegion.y,
+        maxX: canvasRegion.x + canvasRegion.width,
+        maxY: canvasRegion.y + canvasRegion.height
       };
 
       if (!_this.alreadyEnhanced(rect)) {
@@ -677,7 +677,7 @@ function (_React$Component) {
         var onLoad = function onLoad() {
           var ctx = _this.canvasRef.current.getContext("2d");
 
-          ctx.drawImage(img, imageRegion.x, imageRegion.y);
+          ctx.drawImage(img, canvasRegion.x, canvasRegion.y);
 
           _this.canvasIndex.insert(rect);
 
@@ -687,7 +687,7 @@ function (_React$Component) {
         img.addEventListener("load", onLoad, {
           once: true
         });
-        img.src = imageRegion.url;
+        img.src = canvasRegion.url;
       }
     }, _this.props.enhanceDelay));
 
@@ -856,7 +856,7 @@ function (_React$Component) {
           left = _ref.left,
           scale = _ref.scale;
 
-      if (this.canvasRef.current && scale >= this.props.enhanceScale) {
+      if (this.state.containerDimensions.width && this.canvasRef.current && scale >= this.props.enhanceScale) {
         this.enhance();
       }
 
