@@ -802,7 +802,7 @@ function (_React$Component) {
         var containerDimensions = getContainerDimensions(this.divRef);
         var imageDimensions = getDimensions(this.divRef);
 
-        if (!isEqualDimensions(containerDimensions, getDimensions(this.state.containerDimensions)) || !isEqualDimensions(imageDimensions, getDimensions(this.state.imageDimensions))) {
+        if ((!isEqualDimensions(containerDimensions, getDimensions(this.state.containerDimensions)) || !isEqualDimensions(imageDimensions, getDimensions(this.state.imageDimensions))) && containerDimensions.width > 0 && containerDimensions.height > 0) {
           this.cancelAnimation(); //capture new dimensions
 
           this.setState({
@@ -856,7 +856,7 @@ function (_React$Component) {
           left = _ref.left,
           scale = _ref.scale;
 
-      if (this.state.containerDimensions.width && this.canvasRef.current && scale >= this.props.enhanceScale) {
+      if (this.canvasRef.current && scale >= this.props.enhanceScale) {
         this.enhance();
       }
 

@@ -333,8 +333,9 @@ export default class PinchZoomPan extends React.Component {
             const containerDimensions = getContainerDimensions(this.divRef);
             const imageDimensions = getDimensions(this.divRef);
 
-            if (!isEqualDimensions(containerDimensions, getDimensions(this.state.containerDimensions)) ||
-                !isEqualDimensions(imageDimensions, getDimensions(this.state.imageDimensions))) {
+            if ((!isEqualDimensions(containerDimensions, getDimensions(this.state.containerDimensions)) ||
+                !isEqualDimensions(imageDimensions, getDimensions(this.state.imageDimensions)))
+                && containerDimensions.width > 0 && containerDimensions.height > 0) {
                 this.cancelAnimation();
 
                 //capture new dimensions
@@ -385,7 +386,7 @@ export default class PinchZoomPan extends React.Component {
     }
 
     applyTransform({ top, left, scale }, speed) {
-        if (this.state.containerDimensions.width && this.canvasRef.current && scale >= this.props.enhanceScale) {
+        if (this.canvasRef.current && scale >= this.props.enhanceScale) {
             this.enhance();
         }
 
