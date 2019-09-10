@@ -631,6 +631,8 @@ function (_React$Component) {
       //this.canvasRef.current.style.width = `${event.target.width}px`;
 
       _this.maybeHandleDimensionsChanged();
+
+      if (_this.props.onImageLoad) _this.props.onImageLoad();
     });
 
     _defineProperty(_assertThisInitialized(_this), "handleZoomInClick", function () {
