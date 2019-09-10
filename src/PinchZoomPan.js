@@ -209,6 +209,7 @@ export default class PinchZoomPan extends React.Component {
         //this.canvasRef.current.style.height = `${event.target.height}px`;
         //this.canvasRef.current.style.width = `${event.target.width}px`;
         this.maybeHandleDimensionsChanged();
+        if (this.props.onImageLoad) this.props.onImageLoad();
     }
 
     handleZoomInClick = () => {
