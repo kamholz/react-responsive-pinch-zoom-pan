@@ -62,7 +62,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.7.0",
     "@fortawesome/react-fontawesome": "^0.1.4",
     "prop-types": "^15.7.2",
-    "rbush": "^3.0.0",
+    "rbush": "^3.0.1",
     "reselect": "^4.0.0",
     "warning": "^4.0.2"
   },
