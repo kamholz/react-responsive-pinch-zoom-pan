@@ -1019,6 +1019,7 @@ function (_React$Component) {
     key: "render",
     value: function render() {
       var _this$props3 = this.props,
+          imageUrl = _this$props3.imageUrl,
           zoomButtons = _this$props3.zoomButtons,
           maxScale = _this$props3.maxScale,
           debug = _this$props3.debug,
@@ -1054,7 +1055,7 @@ function (_React$Component) {
         onContextMenu: tryCancelEvent,
         style: imageStyle(this.state)
       }, React.createElement("img", {
-        src: this.props.imageUrl,
+        src: imageUrl,
         onLoad: this.handleImageLoad
       }), iiifUrl && iiifDimensions && React.createElement("canvas", {
         className: "canvasOverlay",
@@ -1072,14 +1073,23 @@ function (_React$Component) {
   }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate(prevProps, prevState) {
+      if (this.props.imageUrl !== prevProps.imageUrl) {
+        this.canvasIndex.clear();
+
+        if (this.canvasRef.current) {
+          var ctx = this.canvasRef.current.getContext("2d");
+          ctx.clearRect(0, 0, this.canvasRef.current.width, this.canvasRef.current.height);
+        }
+      }
+
       this.maybeHandleDimensionsChanged();
     }
   }, {
     key: "componentWillUnmount",
     value: function componentWillUnmount() {
       this.cancelAnimation();
-      this.divRef.removeEventListener('touchmove', this.handleTouchMove);
-      window.removeEventListener('resize', this.handleWindowResize);
+      this.divRef.removeEventListener("touchmove", this.handleTouchMove);
+      window.removeEventListener("resize", this.handleWindowResize);
     }
   }, {
     key: "calculateNegativeSpace",
