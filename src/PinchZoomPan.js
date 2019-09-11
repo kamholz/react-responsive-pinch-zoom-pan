@@ -561,7 +561,7 @@ export default class PinchZoomPan extends React.Component {
 
     //lifecycle methods
     render() {
-        const { zoomButtons, maxScale, debug, iiifUrl, iiifDimensions } = this.props;
+        const { imageUrl, zoomButtons, maxScale, debug, iiifUrl, iiifDimensions } = this.props;
         const { scale } = this.state;
 
         const touchAction = this.controlOverscrollViaCss
@@ -598,7 +598,7 @@ export default class PinchZoomPan extends React.Component {
                     style={imageStyle(this.state)}
                 >
                     <img
-                        src={this.props.imageUrl}
+                        src={imageUrl}
                         onLoad={this.handleImageLoad}
                     />
                     {iiifUrl && iiifDimensions &&
@@ -636,13 +636,21 @@ export default class PinchZoomPan extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
+        if (this.props.imageUrl !== prevProps.imageUrl) {
+            this.canvasIndex.clear();
+            if (this.canvasRef.current) {
+                let ctx = this.canvasRef.current.getContext("2d");
+                ctx.clearRect(0, 0, this.canvasRef.current.width, this.canvasRef.current.height);
+            }
+        }
+
         this.maybeHandleDimensionsChanged();
     }
 
     componentWillUnmount() {
         this.cancelAnimation();
-        this.divRef.removeEventListener('touchmove', this.handleTouchMove);
-        window.removeEventListener('resize', this.handleWindowResize);
+        this.divRef.removeEventListener("touchmove", this.handleTouchMove);
+        window.removeEventListener("resize", this.handleWindowResize);
     }
 
     get isImageReady() {
