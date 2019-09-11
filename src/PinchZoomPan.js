@@ -537,7 +537,7 @@ export default class PinchZoomPan extends React.Component {
     }, this.props.enhanceDelay)
 
     maybeEnhance() {
-        if (this.canvasRef.current && scale >= this.props.enhanceScale) {
+        if (this.canvasRef.current && this.state.scale >= this.props.enhanceScale) {
             this.enhance();
         }
     }

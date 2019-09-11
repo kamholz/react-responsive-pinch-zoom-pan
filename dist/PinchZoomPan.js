@@ -990,7 +990,7 @@ function (_React$Component) {
   }, {
     key: "maybeEnhance",
     value: function maybeEnhance() {
-      if (this.canvasRef.current && scale >= this.props.enhanceScale) {
+      if (this.canvasRef.current && this.state.scale >= this.props.enhanceScale) {
         this.enhance();
       }
     }
