@@ -819,8 +819,12 @@ function (_React$Component) {
             } else {
               _this2.maybeAdjustCurrentTransform();
             }
+
+            _this2.maybeEnhance();
           });
           this.debug("Dimensions changed: Container: ".concat(containerDimensions.width, ", ").concat(containerDimensions.height, ", Image: ").concat(imageDimensions.width, ", ").concat(imageDimensions.height));
+        } else {
+          this.maybeEnhance();
         }
       } else {
         this.debug('Image not loaded');
@@ -857,10 +861,7 @@ function (_React$Component) {
       var top = _ref.top,
           left = _ref.left,
           scale = _ref.scale;
-
-      if (this.canvasRef.current && scale >= this.props.enhanceScale) {
-        this.enhance();
-      }
+      this.maybeEnhance();
 
       if (speed > 0) {
         var frame = function frame() {
@@ -981,6 +982,13 @@ function (_React$Component) {
       }
 
       this.constrainAndApplyTransform(initialPosition.top, initialPosition.left, scale, 0, speed);
+    }
+  }, {
+    key: "maybeEnhance",
+    value: function maybeEnhance() {
+      if (this.canvasRef.current && scale >= this.props.enhanceScale) {
+        this.enhance();
+      }
     }
   }, {
     key: "alreadyEnhanced",

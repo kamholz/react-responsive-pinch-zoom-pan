@@ -353,9 +353,12 @@ export default class PinchZoomPan extends React.Component {
                         } else {
                             this.maybeAdjustCurrentTransform();
                         }
+                        this.maybeEnhance();
                     }
                 );
                 this.debug(`Dimensions changed: Container: ${containerDimensions.width}, ${containerDimensions.height}, Image: ${imageDimensions.width}, ${imageDimensions.height}`);
+            } else {
+                this.maybeEnhance();
             }
         }
         else {
@@ -387,9 +390,7 @@ export default class PinchZoomPan extends React.Component {
     }
 
     applyTransform({ top, left, scale }, speed) {
-        if (this.canvasRef.current && scale >= this.props.enhanceScale) {
-            this.enhance();
-        }
+        this.maybeEnhance();
 
         if (speed > 0) {
             const frame = () => {
@@ -534,6 +535,12 @@ export default class PinchZoomPan extends React.Component {
             img.src = canvasRegion.url;
         }
     }, this.props.enhanceDelay)
+
+    maybeEnhance() {
+        if (this.canvasRef.current && scale >= this.props.enhanceScale) {
+            this.enhance();
+        }
+    }
 
     alreadyEnhanced(rect) {
         let result = this.canvasIndex.search(rect);
