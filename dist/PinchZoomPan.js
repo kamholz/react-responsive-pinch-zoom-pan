@@ -66,20 +66,35 @@ function _extends() {
   return _extends.apply(this, arguments);
 }
 
-function _objectSpread(target) {
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    if (enumerableOnly) symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    });
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = arguments[i] != null ? arguments[i] : {};
-    var ownKeys = Object.keys(source);
 
-    if (typeof Object.getOwnPropertySymbols === 'function') {
-      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-      }));
+    if (i % 2) {
+      ownKeys(Object(source), true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
     }
-
-    ownKeys.forEach(function (key) {
-      _defineProperty(target, key, source[key]);
-    });
   }
 
   return target;
@@ -116,6 +131,19 @@ function _setPrototypeOf(o, p) {
   return _setPrototypeOf(o, p);
 }
 
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+
+  try {
+    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -132,8 +160,27 @@ function _possibleConstructorReturn(self, call) {
   return _assertThisInitialized(self);
 }
 
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
+  return function () {
+    var Super = _getPrototypeOf(Derived),
+        result;
+
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+
+      result = Reflect.construct(Super, arguments, NewTarget);
+    } else {
+      result = Super.apply(this, arguments);
+    }
+
+    return _possibleConstructorReturn(this, result);
+  };
+}
+
 function _slicedToArray(arr, i) {
-  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
 
 function _arrayWithHoles(arr) {
@@ -141,6 +188,7 @@ function _arrayWithHoles(arr) {
 }
 
 function _iterableToArrayLimit(arr, i) {
+  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
   var _arr = [];
   var _n = true;
   var _d = false;
@@ -166,8 +214,25 @@ function _iterableToArrayLimit(arr, i) {
   return _arr;
 }
 
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
 function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance");
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 var containerStyle = {
@@ -178,14 +243,14 @@ var containerStyle = {
 var ZoomOutButton = function ZoomOutButton(_ref) {
   var disabled = _ref.disabled,
       onClick = _ref.onClick;
-  return React.createElement("button", {
+  return /*#__PURE__*/React.createElement("button", {
     className: "iconButton",
     style: {
       margin: '10px'
     },
     onClick: onClick,
     disabled: disabled
-  }, React.createElement(reactFontawesome.FontAwesomeIcon, {
+  }, /*#__PURE__*/React.createElement(reactFontawesome.FontAwesomeIcon, {
     icon: freeSolidSvgIcons.faMinus
   }));
 };
@@ -193,7 +258,7 @@ var ZoomOutButton = function ZoomOutButton(_ref) {
 var ZoomInButton = function ZoomInButton(_ref2) {
   var disabled = _ref2.disabled,
       onClick = _ref2.onClick;
-  return React.createElement("button", {
+  return /*#__PURE__*/React.createElement("button", {
     className: "iconButton",
     style: {
       margin: '10px',
@@ -201,7 +266,7 @@ var ZoomInButton = function ZoomInButton(_ref2) {
     },
     onClick: onClick,
     disabled: disabled
-  }, React.createElement(reactFontawesome.FontAwesomeIcon, {
+  }, /*#__PURE__*/React.createElement(reactFontawesome.FontAwesomeIcon, {
     icon: freeSolidSvgIcons.faPlus
   }));
 };
@@ -212,12 +277,12 @@ var ZoomButtons = function ZoomButtons(_ref3) {
       maxScale = _ref3.maxScale,
       onZoomInClick = _ref3.onZoomInClick,
       onZoomOutClick = _ref3.onZoomOutClick;
-  return React.createElement("div", {
+  return /*#__PURE__*/React.createElement("div", {
     style: containerStyle
-  }, React.createElement(ZoomOutButton, {
+  }, /*#__PURE__*/React.createElement(ZoomOutButton, {
     onClick: onZoomOutClick,
     disabled: scale <= minScale
-  }), React.createElement(ZoomInButton, {
+  }), /*#__PURE__*/React.createElement(ZoomInButton, {
     onClick: onZoomInClick,
     disabled: scale >= maxScale
   }));
@@ -247,9 +312,9 @@ var DebugView = (function (_ref) {
   var overflowDisplay = [overflow.top > 0 ? 'top' : '', overflow.right > 0 ? 'right' : '', overflow.bottom > 0 ? 'bottom' : '', overflow.left > 0 ? 'left' : ''].filter(function (o) {
     return o.length;
   }).join(', ') || 'none';
-  return React.createElement("div", {
+  return /*#__PURE__*/React.createElement("div", {
     style: style
-  }, React.createElement("div", null, "top: ".concat(top)), React.createElement("div", null, "left: ".concat(left)), React.createElement("div", null, "scale: ".concat(scale)), React.createElement("div", null, "overflow: ".concat(overflowDisplay)));
+  }, /*#__PURE__*/React.createElement("div", null, "top: ".concat(top)), /*#__PURE__*/React.createElement("div", null, "left: ".concat(left)), /*#__PURE__*/React.createElement("div", null, "scale: ".concat(scale)), /*#__PURE__*/React.createElement("div", null, "overflow: ".concat(overflowDisplay)));
 });
 
 var snapToTarget = function snapToTarget(value, target, tolerance) {
@@ -390,10 +455,10 @@ function calculateOverflowBottom(top, scale, imageDimensions, containerDimension
 
 var getImageOverflow = function getImageOverflow(top, left, scale, imageDimensions, containerDimensions) {
   return {
-    top: calculateOverflowTop(top, scale, imageDimensions, containerDimensions),
+    top: calculateOverflowTop(top),
     right: calculateOverflowRight(left, scale, imageDimensions, containerDimensions),
     bottom: calculateOverflowBottom(top, scale, imageDimensions, containerDimensions),
-    left: calculateOverflowLeft(left, scale, imageDimensions, containerDimensions)
+    left: calculateOverflowLeft(left)
   };
 };
 
@@ -417,7 +482,7 @@ var imageStyle = reselect.createSelector(function (state) {
     display: 'inline-block',
     userSelect: 'none'
   };
-  return isInitialized(top, left, scale) ? _objectSpread({}, style, {
+  return isInitialized(top, left, scale) ? _objectSpread2(_objectSpread2({}, style), {}, {
     transform: "translate3d(".concat(left, "px, ").concat(top, "px, 0) scale(").concat(scale, ")"),
     transformOrigin: '0 0'
   }) : style;
@@ -466,14 +531,12 @@ var debounce = function debounce(func, delay) {
 //These constraints must be checked when image changes, and when container is resized.
 
 
-var PinchZoomPan =
-/*#__PURE__*/
-function (_React$Component) {
+var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
   _inherits(PinchZoomPan, _React$Component);
 
-  function PinchZoomPan() {
-    var _getPrototypeOf2;
+  var _super = _createSuper(PinchZoomPan);
 
+  function PinchZoomPan() {
     var _this;
 
     _classCallCheck(this, PinchZoomPan);
@@ -482,7 +545,7 @@ function (_React$Component) {
       args[_key] = arguments[_key];
     }
 
-    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(PinchZoomPan)).call.apply(_getPrototypeOf2, [this].concat(args)));
+    _this = _super.call.apply(_super, [this].concat(args));
 
     _defineProperty(_assertThisInitialized(_this), "state", {});
 
@@ -1045,17 +1108,17 @@ function (_React$Component) {
         overflow: 'hidden',
         touchAction: touchAction
       };
-      return React.createElement("div", {
+      return /*#__PURE__*/React.createElement("div", {
         style: containerStyle
-      }, zoomButtons && this.isImageReady && this.isTransformInitialized && React.createElement(ZoomButtons, {
+      }, zoomButtons && this.isImageReady && this.isTransformInitialized && /*#__PURE__*/React.createElement(ZoomButtons, {
         scale: scale,
         minScale: getMinScale(this.state, this.props),
         maxScale: maxScale,
         onZoomOutClick: this.handleZoomOutClick,
         onZoomInClick: this.handleZoomInClick
-      }), debug && React.createElement(DebugView, _extends({}, this.state, {
+      }), debug && /*#__PURE__*/React.createElement(DebugView, _extends({}, this.state, {
         overflow: imageOverflow(this.state)
-      })), React.createElement("div", {
+      })), /*#__PURE__*/React.createElement("div", {
         ref: this.handleRefDiv,
         onTouchStart: this.handleTouchStart,
         onTouchEnd: this.handleTouchEnd,
@@ -1066,10 +1129,10 @@ function (_React$Component) {
         onDragStart: tryCancelEvent,
         onContextMenu: tryCancelEvent,
         style: imageStyle(this.state)
-      }, React.createElement("img", {
+      }, /*#__PURE__*/React.createElement("img", {
         src: imageUrl,
         onLoad: this.handleImageLoad
-      }), iiifUrl && iiifDimensions && React.createElement("canvas", {
+      }), iiifUrl && iiifDimensions && /*#__PURE__*/React.createElement("canvas", {
         className: "canvasOverlay",
         ref: this.canvasRef,
         height: iiifDimensions.height,

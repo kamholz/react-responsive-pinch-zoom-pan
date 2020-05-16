@@ -47,9 +47,9 @@
     "rollup-plugin-babel": "^4.3.2",
     "style-loader": "0.23.0",
     "url-loader": "1.1.1",
-    "webpack": "4.19.1",
+    "webpack": "^4.43.0",
     "webpack-cli": "^3.2.1",
-    "webpack-dev-server": "3.1.14"
+    "webpack-dev-server": "^3.11.0"
   },
   "author": "Brad Stiff",
   "homepage": "https://github.com/bradstiff/react-responsive-pinch-zoom-pan",
