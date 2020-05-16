@@ -73,7 +73,7 @@ const debounce = (func, delay) => {
     let callTime, callTimer;
 
     return (args) => {
-        let previousTime = callTime;
+        const previousTime = callTime;
         callTime = Date.now();
         if (previousTime && (callTime - previousTime) <= delay) {
             clearTimeout(callTimer);
@@ -513,8 +513,8 @@ export default class PinchZoomPan extends React.Component {
     }
 
     enhance = debounce(() => {
-        let canvasRegion = this.getCanvasRegion();
-        let rect = {
+        const canvasRegion = this.getCanvasRegion();
+        const rect = {
             minX: canvasRegion.x,
             minY: canvasRegion.y,
             maxX: canvasRegion.x + canvasRegion.width,
@@ -522,10 +522,10 @@ export default class PinchZoomPan extends React.Component {
         };
 
         if (!this.alreadyEnhanced(rect)) {
-            let img = new Image();
+            const img = new Image();
 
             const onLoad = () => {
-                let ctx = this.canvasRef.current.getContext("2d");
+                const ctx = this.canvasRef.current.getContext("2d");
                 ctx.drawImage(img, canvasRegion.x, canvasRegion.y);
                 this.canvasIndex.insert(rect);
                 img.removeEventListener("load", onLoad);
@@ -543,19 +543,19 @@ export default class PinchZoomPan extends React.Component {
     }
 
     alreadyEnhanced(rect) {
-        let result = this.canvasIndex.search(rect);
+        const result = this.canvasIndex.search(rect);
         return result.length && result.some(el => {
             return rect.minX >= el.minX && rect.maxX <= el.maxX && rect.minY >= el.minY && rect.maxY <= el.maxY;
         });
     }
 
     getCanvasRegion() {
-        let { left, top, scale, containerDimensions, imageDimensions } = this.state;
-        let { iiifDimensions: { width: canvasWidth, height: canvasHeight } } = this.props;
-        let x = Math.round(canvasWidth * -1 * left / (imageDimensions.width * scale));
-        let y = Math.round(canvasHeight * -1 * top / (imageDimensions.height * scale));
-        let width = Math.round(canvasWidth * containerDimensions.width / (imageDimensions.width * scale));
-        let height = Math.round(canvasHeight * containerDimensions.height / (imageDimensions.height * scale));
+        const { left, top, scale, containerDimensions, imageDimensions } = this.state;
+        const { iiifDimensions: { width: canvasWidth, height: canvasHeight } } = this.props;
+        const x = Math.round(canvasWidth * -1 * left / (imageDimensions.width * scale));
+        const y = Math.round(canvasHeight * -1 * top / (imageDimensions.height * scale));
+        const width = Math.round(canvasWidth * containerDimensions.width / (imageDimensions.width * scale));
+        const height = Math.round(canvasHeight * containerDimensions.height / (imageDimensions.height * scale));
 
         return {
             x,
@@ -646,7 +646,7 @@ export default class PinchZoomPan extends React.Component {
         if (this.props.imageUrl !== prevProps.imageUrl) {
             this.canvasIndex.clear();
             if (this.canvasRef.current) {
-                let ctx = this.canvasRef.current.getContext("2d");
+                const ctx = this.canvasRef.current.getContext("2d");
                 ctx.clearRect(0, 0, this.canvasRef.current.width, this.canvasRef.current.height);
             }
         }
