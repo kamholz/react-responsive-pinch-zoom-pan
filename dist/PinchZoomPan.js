@@ -1,466 +1,57 @@
-'use strict';
+"use strict";
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var React = _interopDefault(require('react'));
-var PropTypes = _interopDefault(require('prop-types'));
-var reselect = require('reselect');
-var warning = _interopDefault(require('warning'));
-var RBush = _interopDefault(require('rbush'));
-var reactFontawesome = require('@fortawesome/react-fontawesome');
-var freeSolidSvgIcons = require('@fortawesome/free-solid-svg-icons');
-require('./styles.css');
-
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if ("value" in descriptor) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-
-function _extends() {
-  _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
-
-function ownKeys(object, enumerableOnly) {
-  var keys = Object.keys(object);
-
-  if (Object.getOwnPropertySymbols) {
-    var symbols = Object.getOwnPropertySymbols(object);
-    if (enumerableOnly) symbols = symbols.filter(function (sym) {
-      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-    });
-    keys.push.apply(keys, symbols);
-  }
-
-  return keys;
-}
-
-function _objectSpread2(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-
-    if (i % 2) {
-      ownKeys(Object(source), true).forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
-    } else if (Object.getOwnPropertyDescriptors) {
-      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-    } else {
-      ownKeys(Object(source)).forEach(function (key) {
-        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-      });
-    }
-  }
-
-  return target;
-}
-
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf(subClass, superClass);
-}
-
-function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-
-function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
-function _isNativeReflectConstruct() {
-  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
-  if (Reflect.construct.sham) return false;
-  if (typeof Proxy === "function") return true;
-
-  try {
-    Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-
-function _possibleConstructorReturn(self, call) {
-  if (call && (typeof call === "object" || typeof call === "function")) {
-    return call;
-  }
-
-  return _assertThisInitialized(self);
-}
-
-function _createSuper(Derived) {
-  var hasNativeReflectConstruct = _isNativeReflectConstruct();
-
-  return function () {
-    var Super = _getPrototypeOf(Derived),
-        result;
-
-    if (hasNativeReflectConstruct) {
-      var NewTarget = _getPrototypeOf(this).constructor;
-
-      result = Reflect.construct(Super, arguments, NewTarget);
-    } else {
-      result = Super.apply(this, arguments);
-    }
-
-    return _possibleConstructorReturn(this, result);
-  };
-}
-
-function _slicedToArray(arr, i) {
-  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
-}
-
-function _arrayWithHoles(arr) {
-  if (Array.isArray(arr)) return arr;
-}
-
-function _iterableToArrayLimit(arr, i) {
-  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
-  var _arr = [];
-  var _n = true;
-  var _d = false;
-  var _e = undefined;
-
-  try {
-    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-      _arr.push(_s.value);
-
-      if (i && _arr.length === i) break;
-    }
-  } catch (err) {
-    _d = true;
-    _e = err;
-  } finally {
-    try {
-      if (!_n && _i["return"] != null) _i["return"]();
-    } finally {
-      if (_d) throw _e;
-    }
-  }
-
-  return _arr;
-}
-
-function _unsupportedIterableToArray(o, minLen) {
-  if (!o) return;
-  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
-  var n = Object.prototype.toString.call(o).slice(8, -1);
-  if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
-}
-
-function _arrayLikeToArray(arr, len) {
-  if (len == null || len > arr.length) len = arr.length;
-
-  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
-
-  return arr2;
-}
-
-function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-
-var containerStyle = {
-  position: 'absolute',
-  zIndex: 1000
-};
-
-var ZoomOutButton = function ZoomOutButton(_ref) {
-  var disabled = _ref.disabled,
-      onClick = _ref.onClick;
-  return /*#__PURE__*/React.createElement("button", {
-    className: "iconButton",
-    style: {
-      margin: '10px'
-    },
-    onClick: onClick,
-    disabled: disabled
-  }, /*#__PURE__*/React.createElement(reactFontawesome.FontAwesomeIcon, {
-    icon: freeSolidSvgIcons.faMinus
-  }));
-};
-
-var ZoomInButton = function ZoomInButton(_ref2) {
-  var disabled = _ref2.disabled,
-      onClick = _ref2.onClick;
-  return /*#__PURE__*/React.createElement("button", {
-    className: "iconButton",
-    style: {
-      margin: '10px',
-      marginLeft: '0px'
-    },
-    onClick: onClick,
-    disabled: disabled
-  }, /*#__PURE__*/React.createElement(reactFontawesome.FontAwesomeIcon, {
-    icon: freeSolidSvgIcons.faPlus
-  }));
-};
-
-var ZoomButtons = function ZoomButtons(_ref3) {
-  var scale = _ref3.scale,
-      minScale = _ref3.minScale,
-      maxScale = _ref3.maxScale,
-      onZoomInClick = _ref3.onZoomInClick,
-      onZoomOutClick = _ref3.onZoomOutClick;
-  return /*#__PURE__*/React.createElement("div", {
-    style: containerStyle
-  }, /*#__PURE__*/React.createElement(ZoomOutButton, {
-    onClick: onZoomOutClick,
-    disabled: scale <= minScale
-  }), /*#__PURE__*/React.createElement(ZoomInButton, {
-    onClick: onZoomInClick,
-    disabled: scale >= maxScale
-  }));
-};
-
-ZoomButtons.propTypes = {
-  scale: PropTypes.number.isRequired,
-  minScale: PropTypes.number.isRequired,
-  maxScale: PropTypes.number.isRequired,
-  onZoomInClick: PropTypes.func.isRequired,
-  onZoomOutClick: PropTypes.func.isRequired
-};
-
-var style = {
-  position: 'absolute',
-  marginTop: '40px',
-  marginLeft: '5px',
-  backgroundColor: 'rgba(0,0,0,0)',
-  zIndex: '1000',
-  color: 'white'
-};
-var DebugView = (function (_ref) {
-  var top = _ref.top,
-      left = _ref.left,
-      scale = _ref.scale,
-      overflow = _ref.overflow;
-  var overflowDisplay = [overflow.top > 0 ? 'top' : '', overflow.right > 0 ? 'right' : '', overflow.bottom > 0 ? 'bottom' : '', overflow.left > 0 ? 'left' : ''].filter(function (o) {
-    return o.length;
-  }).join(', ') || 'none';
-  return /*#__PURE__*/React.createElement("div", {
-    style: style
-  }, /*#__PURE__*/React.createElement("div", null, "top: ".concat(top)), /*#__PURE__*/React.createElement("div", null, "left: ".concat(left)), /*#__PURE__*/React.createElement("div", null, "scale: ".concat(scale)), /*#__PURE__*/React.createElement("div", null, "overflow: ".concat(overflowDisplay)));
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports["default"] = void 0;
 
-var snapToTarget = function snapToTarget(value, target, tolerance) {
-  var withinRange = Math.abs(target - value) < tolerance;
-  return withinRange ? target : value;
-};
-var constrain = function constrain(lowerBound, upperBound, value) {
-  return Math.min(upperBound, Math.max(lowerBound, value));
-};
-var negate = function negate(value) {
-  return value * -1;
-};
-var getRelativePosition = function getRelativePosition(_ref, relativeToElement) {
-  var clientX = _ref.clientX,
-      clientY = _ref.clientY;
-  var rect = relativeToElement.getBoundingClientRect();
-  return {
-    x: clientX - rect.left,
-    y: clientY - rect.top
-  };
-};
-var getPinchMidpoint = function getPinchMidpoint(_ref2) {
-  var _ref3 = _slicedToArray(_ref2, 2),
-      touch1 = _ref3[0],
-      touch2 = _ref3[1];
+var _react = _interopRequireDefault(require("react"));
 
-  return {
-    x: (touch1.clientX + touch2.clientX) / 2,
-    y: (touch1.clientY + touch2.clientY) / 2
-  };
-};
-var getPinchLength = function getPinchLength(_ref4) {
-  var _ref5 = _slicedToArray(_ref4, 2),
-      touch1 = _ref5[0],
-      touch2 = _ref5[1];
+var _propTypes = _interopRequireDefault(require("prop-types"));
 
-  return Math.sqrt(Math.pow(touch1.clientY - touch2.clientY, 2) + Math.pow(touch1.clientX - touch2.clientX, 2));
-};
-var isEqualDimensions = function isEqualDimensions(dimensions1, dimensions2) {
-  if (dimensions1 === dimensions2 === undefined) {
-    return true;
-  }
+var _reselect = require("reselect");
 
-  if (dimensions1 === undefined || dimensions2 === undefined) {
-    return false;
-  }
+var _warning = _interopRequireDefault(require("warning"));
 
-  return dimensions1.width === dimensions2.width && dimensions1.height === dimensions2.height;
-};
-var getDimensions = function getDimensions(object) {
-  if (object === undefined) {
-    return undefined;
-  }
+var _rbush = _interopRequireDefault(require("rbush"));
 
-  return {
-    width: object.offsetWidth || object.width,
-    height: object.offsetHeight || object.height
-  };
-};
-var getContainerDimensions = function getContainerDimensions(image) {
-  return {
-    width: image.parentNode.offsetWidth,
-    height: image.parentNode.offsetHeight
-  };
-};
-var isEqualTransform = function isEqualTransform(transform1, transform2) {
-  if (transform1 === transform2 === undefined) {
-    return true;
-  }
+var _ZoomButtons = _interopRequireDefault(require("./ZoomButtons"));
 
-  if (transform1 === undefined || transform2 === undefined) {
-    return false;
-  }
+var _StateDebugView = _interopRequireDefault(require("./StateDebugView"));
 
-  return round(transform1.top, 5) === round(transform2.top, 5) && round(transform1.left, 5) === round(transform2.left, 5) && round(transform1.scale, 5) === round(transform2.scale, 5);
-};
-var getAutofitScale = function getAutofitScale(containerDimensions, imageDimensions) {
-  var _ref6 = imageDimensions || {},
-      imageWidth = _ref6.width,
-      imageHeight = _ref6.height;
+var _Utils = require("./Utils");
 
-  if (!(imageWidth > 0 && imageHeight > 0)) {
-    return 1;
-  }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-  return Math.min(containerDimensions.width / imageWidth, containerDimensions.height / imageHeight, 1);
-};
-var getMinScale = reselect.createSelector(function (state) {
-  return state.containerDimensions;
-}, function (state) {
-  return state.imageDimensions;
-}, function (state, props) {
-  return props.minScale;
-}, function (containerDimensions, imageDimensions, minScaleProp) {
-  return String(minScaleProp).toLowerCase() === 'auto' ? getAutofitScale(containerDimensions, imageDimensions) : minScaleProp || 1;
-});
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function round(number, precision) {
-  if (precision && number !== null && number !== undefined) {
-    // Shift with exponential notation to avoid floating-point issues.
-    // See [MDN](https://mdn.io/round#Examples) for more details.
-    var pair = (String(number) + 'e').split('e'),
-        value = Math.round(pair[0] + 'e' + (+pair[1] + precision));
-    pair = (String(value) + 'e').split('e');
-    return +(pair[0] + 'e' + (+pair[1] - precision));
-  }
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
-  return Math.round(number);
-}
-var tryCancelEvent = function tryCancelEvent(event) {
-  if (event.cancelable === false) {
-    return false;
-  }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-  event.preventDefault();
-  return true;
-};
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function calculateOverflowLeft(left, scale, imageDimensions, containerDimensions) {
-  var overflow = negate(left);
-  return overflow > 0 ? overflow : 0;
-}
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function calculateOverflowTop(top, scale, imageDimensions, containerDimensions) {
-  var overflow = negate(top);
-  return overflow > 0 ? overflow : 0;
-}
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
-function calculateOverflowRight(left, scale, imageDimensions, containerDimensions) {
-  var overflow = Math.max(0, scale * imageDimensions.width - containerDimensions.width);
-  return overflow > 0 ? overflow - negate(left) : 0;
-}
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function calculateOverflowBottom(top, scale, imageDimensions, containerDimensions) {
-  var overflow = Math.max(0, scale * imageDimensions.height - containerDimensions.height);
-  return overflow > 0 ? overflow - negate(top) : 0;
-}
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
-var getImageOverflow = function getImageOverflow(top, left, scale, imageDimensions, containerDimensions) {
-  return {
-    top: calculateOverflowTop(top),
-    right: calculateOverflowRight(left, scale, imageDimensions, containerDimensions),
-    bottom: calculateOverflowBottom(top, scale, imageDimensions, containerDimensions),
-    left: calculateOverflowLeft(left)
-  };
-};
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var OVERZOOM_TOLERANCE = 0.05;
 var DOUBLE_TAP_THRESHOLD = 250;
@@ -470,7 +61,7 @@ var isInitialized = function isInitialized(top, left, scale) {
   return scale !== undefined && left !== undefined && top !== undefined;
 };
 
-var imageStyle = reselect.createSelector(function (state) {
+var imageStyle = (0, _reselect.createSelector)(function (state) {
   return state.top;
 }, function (state) {
   return state.left;
@@ -482,12 +73,12 @@ var imageStyle = reselect.createSelector(function (state) {
     display: 'inline-block',
     userSelect: 'none'
   };
-  return isInitialized(top, left, scale) ? _objectSpread2(_objectSpread2({}, style), {}, {
+  return isInitialized(top, left, scale) ? _objectSpread(_objectSpread({}, style), {}, {
     transform: "translate3d(".concat(left, "px, ").concat(top, "px, 0) scale(").concat(scale, ")"),
     transformOrigin: '0 0'
   }) : style;
 });
-var imageOverflow = reselect.createSelector(function (state) {
+var imageOverflow = (0, _reselect.createSelector)(function (state) {
   return state.top;
 }, function (state) {
   return state.left;
@@ -502,9 +93,9 @@ var imageOverflow = reselect.createSelector(function (state) {
     return '';
   }
 
-  return getImageOverflow(top, left, scale, imageDimensions, containerDimensions);
+  return (0, _Utils.getImageOverflow)(top, left, scale, imageDimensions, containerDimensions);
 });
-var browserPanActions = reselect.createSelector(imageOverflow, function (imageOverflow) {
+var browserPanActions = (0, _reselect.createSelector)(imageOverflow, function (imageOverflow) {
   //Determine the panning directions where there is no image overflow and let
   //the browser handle those directions (e.g., scroll viewport if possible).
   //Need to replace 'pan-left pan-right' with 'pan-x', etc. otherwise
@@ -559,9 +150,9 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_this), "divRef", void 0);
 
-    _defineProperty(_assertThisInitialized(_this), "canvasRef", React.createRef());
+    _defineProperty(_assertThisInitialized(_this), "canvasRef", /*#__PURE__*/_react["default"].createRef());
 
-    _defineProperty(_assertThisInitialized(_this), "canvasIndex", new RBush());
+    _defineProperty(_assertThisInitialized(_this), "canvasIndex", new _rbush["default"]());
 
     _defineProperty(_assertThisInitialized(_this), "isImageLoaded", void 0);
 
@@ -573,14 +164,14 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
       var touches = event.touches;
 
       if (touches.length === 2) {
-        _this.lastPinchLength = getPinchLength(touches);
+        _this.lastPinchLength = (0, _Utils.getPinchLength)(touches);
         _this.lastPanPointerPosition = null;
       } else if (touches.length === 1) {
         _this.lastPinchLength = null;
 
         _this.pointerDown(touches[0]);
 
-        tryCancelEvent(event); //suppress mouse events
+        (0, _Utils.tryCancelEvent)(event); //suppress mouse events
       }
     });
 
@@ -591,7 +182,7 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
         _this.pinchChange(touches); //suppress viewport scaling on iOS
 
 
-        tryCancelEvent(event);
+        (0, _Utils.tryCancelEvent)(event);
       } else if (touches.length === 1) {
         var requestedPan = _this.pan(touches[0]);
 
@@ -621,7 +212,7 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
             return;
           }
 
-          tryCancelEvent(event);
+          (0, _Utils.tryCancelEvent)(event);
         }
       }
     });
@@ -631,13 +222,13 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
 
       if (event.touches.length === 0 && event.changedTouches.length === 1) {
         if (_this.lastPointerUpTimeStamp && _this.lastPointerUpTimeStamp + DOUBLE_TAP_THRESHOLD > event.timeStamp) {
-          var pointerPosition = getRelativePosition(event.changedTouches[0], _this.divRef.parentNode);
+          var pointerPosition = (0, _Utils.getRelativePosition)(event.changedTouches[0], _this.divRef.parentNode);
 
           _this.doubleClick(pointerPosition);
         }
 
         _this.lastPointerUpTimeStamp = event.timeStamp;
-        tryCancelEvent(event); //suppress mouse events
+        (0, _Utils.tryCancelEvent)(event); //suppress mouse events
       } //We allow transient +/-5% over-pinching.
       //Animate the bounce back to constraints if applicable.
 
@@ -662,7 +253,7 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
     _defineProperty(_assertThisInitialized(_this), "handleMouseDoubleClick", function (event) {
       _this.cancelAnimation();
 
-      var pointerPosition = getRelativePosition(event, _this.divRef.parentNode);
+      var pointerPosition = (0, _Utils.getRelativePosition)(event, _this.divRef.parentNode);
 
       _this.doubleClick(pointerPosition);
     });
@@ -670,19 +261,19 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
     _defineProperty(_assertThisInitialized(_this), "handleMouseWheel", function (event) {
       _this.cancelAnimation();
 
-      var point = getRelativePosition(event, _this.divRef.parentNode);
+      var point = (0, _Utils.getRelativePosition)(event, _this.divRef.parentNode);
 
       if (event.deltaY > 0) {
-        if (_this.state.scale > getMinScale(_this.state, _this.props)) {
+        if (_this.state.scale > (0, _Utils.getMinScale)(_this.state, _this.props)) {
           _this.zoomOut(point);
 
-          tryCancelEvent(event);
+          (0, _Utils.tryCancelEvent)(event);
         }
       } else if (event.deltaY < 0) {
         if (_this.state.scale < _this.props.maxScale) {
           _this.zoomIn(point);
 
-          tryCancelEvent(event);
+          (0, _Utils.tryCancelEvent)(event);
         }
       }
     });
@@ -696,6 +287,12 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
       _this.maybeHandleDimensionsChanged();
 
       if (_this.props.onImageLoad) _this.props.onImageLoad();
+      /*
+      const { onLoad } = React.Children.only(this.props.children).props;
+      if (typeof onLoad === 'function') {
+          onLoad(event);
+      }
+      */
     });
 
     _defineProperty(_assertThisInitialized(_this), "handleZoomInClick", function () {
@@ -767,7 +364,7 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
     key: "pointerDown",
     //actions
     value: function pointerDown(clientPosition) {
-      this.lastPanPointerPosition = getRelativePosition(clientPosition, this.divRef.parentNode);
+      this.lastPanPointerPosition = (0, _Utils.getRelativePosition)(clientPosition, this.divRef.parentNode);
     }
   }, {
     key: "pan",
@@ -782,7 +379,7 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
         return 0;
       }
 
-      var pointerPosition = getRelativePosition(pointerClientPosition, this.divRef.parentNode);
+      var pointerPosition = (0, _Utils.getRelativePosition)(pointerClientPosition, this.divRef.parentNode);
       var translateX = pointerPosition.x - this.lastPanPointerPosition.x;
       var translateY = pointerPosition.y - this.lastPanPointerPosition.y;
       this.lastPanPointerPosition = pointerPosition;
@@ -791,8 +388,8 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
       this.constrainAndApplyTransform(top, left, this.state.scale, 0, 0);
       return {
         up: translateY > 0 ? translateY : 0,
-        down: translateY < 0 ? negate(translateY) : 0,
-        right: translateX < 0 ? negate(translateX) : 0,
+        down: translateY < 0 ? (0, _Utils.negate)(translateY) : 0,
+        right: translateX < 0 ? (0, _Utils.negate)(translateX) : 0,
         left: translateX > 0 ? translateX : 0
       };
     }
@@ -809,8 +406,8 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "pinchChange",
     value: function pinchChange(touches) {
-      var length = getPinchLength(touches);
-      var midpoint = getPinchMidpoint(touches);
+      var length = (0, _Utils.getPinchLength)(touches);
+      var midpoint = (0, _Utils.getPinchMidpoint)(touches);
       var scale = this.lastPinchLength ? this.state.scale * length / this.lastPinchLength //sometimes we get a touchchange before a touchstart when pinching
       : this.state.scale;
       this.zoom(scale, midpoint, OVERZOOM_TOLERANCE);
@@ -868,10 +465,10 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
       var _this2 = this;
 
       if (this.isImageReady) {
-        var containerDimensions = getContainerDimensions(this.divRef);
-        var imageDimensions = getDimensions(this.divRef);
+        var containerDimensions = (0, _Utils.getContainerDimensions)(this.divRef);
+        var imageDimensions = (0, _Utils.getDimensions)(this.divRef);
 
-        if ((!isEqualDimensions(containerDimensions, getDimensions(this.state.containerDimensions)) || !isEqualDimensions(imageDimensions, getDimensions(this.state.imageDimensions))) && containerDimensions.width > 0 && containerDimensions.height > 0) {
+        if ((!(0, _Utils.isEqualDimensions)(containerDimensions, (0, _Utils.getDimensions)(this.state.containerDimensions)) || !(0, _Utils.isEqualDimensions)(imageDimensions, (0, _Utils.getDimensions)(this.state.imageDimensions))) && containerDimensions.width > 0 && containerDimensions.height > 0) {
           this.cancelAnimation(); //capture new dimensions
 
           this.setState({
@@ -913,7 +510,7 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
       var transform = this.getCorrectedTransform(requestedTransform, tolerance) || requestedTransform;
       this.debug("Applying transform: left ".concat(transform.left, ", top ").concat(transform.top, ", scale ").concat(transform.scale));
 
-      if (isEqualTransform(transform, this.state)) {
+      if ((0, _Utils.isEqualTransform)(transform, this.state)) {
         return false;
       }
 
@@ -936,12 +533,12 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
           var translateX = left - _this3.state.left;
           var translateScale = scale - _this3.state.scale;
           var nextTransform = {
-            top: snapToTarget(_this3.state.top + speed * translateY, top, 1),
-            left: snapToTarget(_this3.state.left + speed * translateX, left, 1),
-            scale: snapToTarget(_this3.state.scale + speed * translateScale, scale, 0.001)
+            top: (0, _Utils.snapToTarget)(_this3.state.top + speed * translateY, top, 1),
+            left: (0, _Utils.snapToTarget)(_this3.state.left + speed * translateX, left, 1),
+            scale: (0, _Utils.snapToTarget)(_this3.state.scale + speed * translateScale, scale, 0.001)
           }; //animation runs until we reach the target
 
-          if (!isEqualTransform(nextTransform, _this3.state)) {
+          if (!(0, _Utils.isEqualTransform)(nextTransform, _this3.state)) {
             _this3.setState(nextTransform, function () {
               return _this3.animation = requestAnimationFrame(frame);
             });
@@ -963,7 +560,7 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
     value: function getConstrainedScale(requestedScale, tolerance) {
       var lowerBoundFactor = 1.0 - tolerance;
       var upperBoundFactor = 1.0 + tolerance;
-      return constrain(getMinScale(this.state, this.props) * lowerBoundFactor, this.props.maxScale * upperBoundFactor, requestedScale);
+      return (0, _Utils.constrain)((0, _Utils.getMinScale)(this.state, this.props) * lowerBoundFactor, this.props.maxScale * upperBoundFactor, requestedScale);
     } //Returns constrained transform when requested transform is outside constraints with tolerance, otherwise returns null
 
   }, {
@@ -973,8 +570,8 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
 
       var negativeSpace = this.calculateNegativeSpace(scale);
       var overflow = {
-        width: Math.max(0, negate(negativeSpace.width)),
-        height: Math.max(0, negate(negativeSpace.height))
+        width: Math.max(0, (0, _Utils.negate)(negativeSpace.width)),
+        height: Math.max(0, (0, _Utils.negate)(negativeSpace.height))
       }; //if image overflows container, prevent moving by more than the overflow
       //example: overflow.height = 100, tolerance = 0.05 => top is constrained between -105 and +5
 
@@ -986,14 +583,14 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
           imageDimensions = _this$state2.imageDimensions,
           containerDimensions = _this$state2.containerDimensions;
       var upperBoundFactor = 1.0 + tolerance;
-      var top = overflow.height ? constrain(negate(overflow.height) * upperBoundFactor, overflow.height * upperBoundFactor - overflow.height, requestedTransform.top) : position === 'center' ? (containerDimensions.height - imageDimensions.height * scale) / 2 : initialTop || 0;
-      var left = overflow.width ? constrain(negate(overflow.width) * upperBoundFactor, overflow.width * upperBoundFactor - overflow.width, requestedTransform.left) : position === 'center' ? (containerDimensions.width - imageDimensions.width * scale) / 2 : initialLeft || 0;
+      var top = overflow.height ? (0, _Utils.constrain)((0, _Utils.negate)(overflow.height) * upperBoundFactor, overflow.height * upperBoundFactor - overflow.height, requestedTransform.top) : position === 'center' ? (containerDimensions.height - imageDimensions.height * scale) / 2 : initialTop || 0;
+      var left = overflow.width ? (0, _Utils.constrain)((0, _Utils.negate)(overflow.width) * upperBoundFactor, overflow.width * upperBoundFactor - overflow.width, requestedTransform.left) : position === 'center' ? (containerDimensions.width - imageDimensions.width * scale) / 2 : initialLeft || 0;
       var constrainedTransform = {
         top: top,
         left: left,
         scale: scale
       };
-      return isEqualTransform(constrainedTransform, requestedTransform) ? null : constrainedTransform;
+      return (0, _Utils.isEqualTransform)(constrainedTransform, requestedTransform) ? null : constrainedTransform;
     } //Ensure current transform is within constraints
 
   }, {
@@ -1019,24 +616,24 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
           maxScale = _this$props2.maxScale,
           initialTop = _this$props2.initialTop,
           initialLeft = _this$props2.initialLeft;
-      var scale = String(initialScale).toLowerCase() === 'auto' ? getAutofitScale(containerDimensions, imageDimensions) : initialScale;
-      var minScale = getMinScale(this.state, this.props);
+      var scale = String(initialScale).toLowerCase() === 'auto' ? (0, _Utils.getAutofitScale)(containerDimensions, imageDimensions) : initialScale;
+      var minScale = (0, _Utils.getMinScale)(this.state, this.props);
 
       if (minScale > maxScale) {
-        warning(false, 'minScale cannot exceed maxScale.');
+        (0, _warning["default"])(false, 'minScale cannot exceed maxScale.');
         return;
       }
 
       if (scale < minScale || scale > maxScale) {
-        warning(false, 'initialScale must be between minScale and maxScale.');
+        (0, _warning["default"])(false, 'initialScale must be between minScale and maxScale.');
         return;
       }
 
       var initialPosition;
 
       if (position === 'center') {
-        warning(initialTop === undefined, 'initialTop prop should not be supplied with position=center. It was ignored.');
-        warning(initialLeft === undefined, 'initialLeft prop should not be supplied with position=center. It was ignored.');
+        (0, _warning["default"])(initialTop === undefined, 'initialTop prop should not be supplied with position=center. It was ignored.');
+        (0, _warning["default"])(initialLeft === undefined, 'initialLeft prop should not be supplied with position=center. It was ignored.');
         initialPosition = {
           top: (containerDimensions.width - imageDimensions.width * scale) / 2,
           left: (containerDimensions.height - imageDimensions.height * scale) / 2
@@ -1108,17 +705,17 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
         overflow: 'hidden',
         touchAction: touchAction
       };
-      return /*#__PURE__*/React.createElement("div", {
+      return /*#__PURE__*/_react["default"].createElement("div", {
         style: containerStyle
-      }, zoomButtons && this.isImageReady && this.isTransformInitialized && /*#__PURE__*/React.createElement(ZoomButtons, {
+      }, zoomButtons && this.isImageReady && this.isTransformInitialized && /*#__PURE__*/_react["default"].createElement(_ZoomButtons["default"], {
         scale: scale,
-        minScale: getMinScale(this.state, this.props),
+        minScale: (0, _Utils.getMinScale)(this.state, this.props),
         maxScale: maxScale,
         onZoomOutClick: this.handleZoomOutClick,
         onZoomInClick: this.handleZoomInClick
-      }), debug && /*#__PURE__*/React.createElement(DebugView, _extends({}, this.state, {
+      }), debug && /*#__PURE__*/_react["default"].createElement(_StateDebugView["default"], _extends({}, this.state, {
         overflow: imageOverflow(this.state)
-      })), /*#__PURE__*/React.createElement("div", {
+      })), /*#__PURE__*/_react["default"].createElement("div", {
         ref: this.handleRefDiv,
         onTouchStart: this.handleTouchStart,
         onTouchEnd: this.handleTouchEnd,
@@ -1126,13 +723,13 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
         onMouseMove: this.handleMouseMove,
         onDoubleClick: this.handleMouseDoubleClick,
         onWheel: this.handleMouseWheel,
-        onDragStart: tryCancelEvent,
-        onContextMenu: tryCancelEvent,
+        onDragStart: _Utils.tryCancelEvent,
+        onContextMenu: _Utils.tryCancelEvent,
         style: imageStyle(this.state)
-      }, /*#__PURE__*/React.createElement("img", {
+      }, /*#__PURE__*/_react["default"].createElement("img", {
         src: imageUrl,
         onLoad: this.handleImageLoad
-      }), iiifUrl && iiifDimensions && /*#__PURE__*/React.createElement("canvas", {
+      }), iiifUrl && iiifDimensions && /*#__PURE__*/_react["default"].createElement("canvas", {
         className: "canvasOverlay",
         ref: this.canvasRef,
         height: iiifDimensions.height,
@@ -1207,7 +804,7 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "controlOverscrollViaCss",
     get: function get() {
-      return CSS && CSS.supports('touch-action', 'pan-up');
+      return window.CSS && window.CSS.supports('touch-action', 'pan-up');
     }
   }], [{
     key: "getDerivedStateFromProps",
@@ -1226,7 +823,9 @@ var PinchZoomPan = /*#__PURE__*/function (_React$Component) {
   }]);
 
   return PinchZoomPan;
-}(React.Component);
+}(_react["default"].Component);
+
+exports["default"] = PinchZoomPan;
 PinchZoomPan.defaultProps = {
   initialScale: 'auto',
   minScale: 'auto',
@@ -1238,14 +837,12 @@ PinchZoomPan.defaultProps = {
   doubleTapBehavior: 'reset'
 };
 PinchZoomPan.propTypes = {
-  initialScale: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  minScale: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  maxScale: PropTypes.number,
-  position: PropTypes.oneOf(['topLeft', 'center']),
-  zoomButtons: PropTypes.bool,
-  doubleTapBehavior: PropTypes.oneOf(['reset', 'zoom']),
-  initialTop: PropTypes.number,
-  initialLeft: PropTypes.number
+  initialScale: _propTypes["default"].oneOfType([_propTypes["default"].number, _propTypes["default"].string]),
+  minScale: _propTypes["default"].oneOfType([_propTypes["default"].number, _propTypes["default"].string]),
+  maxScale: _propTypes["default"].number,
+  position: _propTypes["default"].oneOf(['topLeft', 'center']),
+  zoomButtons: _propTypes["default"].bool,
+  doubleTapBehavior: _propTypes["default"].oneOf(['reset', 'zoom']),
+  initialTop: _propTypes["default"].number,
+  initialLeft: _propTypes["default"].number
 };
-
-module.exports = PinchZoomPan;
