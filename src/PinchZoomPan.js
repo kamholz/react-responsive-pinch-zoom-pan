@@ -210,6 +210,12 @@ export default class PinchZoomPan extends React.Component {
         //this.canvasRef.current.style.width = `${event.target.width}px`;
         this.maybeHandleDimensionsChanged();
         if (this.props.onImageLoad) this.props.onImageLoad();
+        /*
+        const { onLoad } = React.Children.only(this.props.children).props;
+        if (typeof onLoad === 'function') {
+            onLoad(event);
+        }
+        */
     }
 
     handleZoomInClick = () => {
@@ -669,7 +675,7 @@ export default class PinchZoomPan extends React.Component {
     }
 
     get controlOverscrollViaCss() {
-        return CSS && CSS.supports('touch-action', 'pan-up');
+        return window.CSS && window.CSS.supports('touch-action', 'pan-up');
     }
 
     calculateNegativeSpace(scale) {
