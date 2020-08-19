@@ -3,7 +3,6 @@
   "version": "0.3.0",
   "description": "Enables zooming and panning an image, both mobile and desktop.",
   "main": "dist/PinchZoomPan.js",
-  "module": "dist/PinchZoomPan.esm.js",
   "scripts": {
     "start": "webpack-dev-server --mode development --host 0.0.0.0",
     "test": "jest",
